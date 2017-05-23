@@ -6,27 +6,6 @@ import numpy as np
 import fractions as frac
 from parser_functions import *
 
-# Create RE objects
-
-
-comma_re = re.compile(r'(\d)\,(\d\d\d)')
-mult_re = re.compile(r'(\d)(\()|(\d)([a-zA-Z])')
-
-token_specification = [
-    ('NEGNUM', r'^(\-\d+\.?\d*)'),  # Negative integer or decimal number
-    ('NUMBER', r'\d+\.?\d*'),       # Integer or decimal number
-    ('PI', r'PI'),                  # PI
-    ('FUNC', r'`+'),                # Functions
-    ('OP', r'[+\-*/\^]'),           # Arithmetic operators
-    ('PARENS', r'\(_+\)'),          # Parenthetical terms
-    ('OTHER', r'[A-Za-z]+'),        # Any other words
-    ('LRP', r'[\(\)]'),             # Any parentheses
-    ('MISMATCH', r'.'),             # Any other character
-]
-
-tok_reg = '|'.join('(?P<%s>%s)' % pair for pair in token_specification)
-token_re = re.compile(tok_reg)
-
 # ### Preparing the Expression
 
 
@@ -425,27 +404,6 @@ def disp_ans(expr):
 
 
 if __name__ == '__main__':
-    # bad_exp = '-4,029 - 0.25'
-    # disp_ans(bad_exp)
-
-    # exp1 = '5+sin(4*6(3-5))'
-    # disp_ans(exp1)
-
-    # exp1a = '5+sin(-4)'
-    # disp_ans(exp1a)
-
-    # bad1 = '8+100*-21+63'
-    # disp_ans(bad1)
-
-    # bad2 = '8+-100*-21+63'
-    # disp_ans(bad2)
-
-    # exp2 = '4,029 / -4'
-    # disp_ans(exp2)
-
-    # exp2a = '4,029 * - 0.25'
-    # disp_ans(exp2a)
-
     neg_base = '-3^0.5'
     disp_ans(neg_base)
 
