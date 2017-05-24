@@ -13,7 +13,7 @@ import re
 binary_operators = ['^', '*', '/', '+', '-']
 
 # In order for a function to be evaluated in the parser, it needs to be
-# in the following list and the equivalent python function also needs to 
+# in the following list and the equivalent python function also needs to
 # be defined. All entries in the list should be in ALL CAPS and functions
 # should be named with the preffix 'func_'.
 # E.g. sine is SIN in the list and the function func_sin needs to be defined.
@@ -46,6 +46,10 @@ mult_re = re.compile(r'(\d)(\()|(\d)([a-zA-Z])')
 
 tok_reg = '|'.join('(?P<%s>%s)' % pair for pair in token_specification)
 token_re = re.compile(tok_reg)
+
+complex_re = re.compile(r'(\d+(\.\d*)?[+-])?\d+(\.\d*)?[ij]')
+
+# complex_re_2 = re.compile(r'[-+]?(\d+(\.\d*)?|\.\d+)')
 
 
 def func_abs(x):
@@ -134,5 +138,22 @@ def func_trunc(n, x):
     return n
 
 
+complex_strings = ['16+1.7320508075688772j', '16 + 1.7320508075688772 j',
+                   '7-12i', '14+2i', 'win']
+
+# for text in complex_strings:
+#     match_obj = complex_re.search(text)
+#     if match_obj is None:
+#         continue
+#     else:
+#         print(match_obj.group())
+
+
 if __name__ == '__main__':
-    print(func_mapper)
+    # print(func_mapper)
+    for text in complex_strings:
+        match_obj = complex_re.search(text)
+        if match_obj is None:
+            continue
+        else:
+            print(match_obj.group())
