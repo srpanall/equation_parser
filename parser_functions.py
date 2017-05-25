@@ -7,7 +7,9 @@
 import math
 import collections
 import re
+from itertools import product
 # import fractions
+# from pprint import pprint
 
 
 binary_operators = ['^', '*', '/', '+', '-']
@@ -46,8 +48,6 @@ mult_re = re.compile(r'(\d)(\()|(\d)([a-zA-Z])')
 
 tok_reg = '|'.join('(?P<%s>%s)' % pair for pair in token_specification)
 token_re = re.compile(tok_reg)
-
-complex_re = re.compile(r'(\d+(\.\d*)?[+-])?\d+(\.\d*)?[ij]')
 
 # complex_re_2 = re.compile(r'[-+]?(\d+(\.\d*)?|\.\d+)')
 
@@ -139,21 +139,54 @@ def func_trunc(n, x):
 
 
 complex_strings = ['16+1.7320508075688772j', '16 + 1.7320508075688772 j',
-                   '7-12i', '14+2i', 'win']
+                   '7-12i', '14+2i', 'win', '(7-12i)*(14+2i)']
 
-# for text in complex_strings:
-#     match_obj = complex_re.search(text)
-#     if match_obj is None:
-#         continue
-#     else:
-#         print(match_obj.group())
+# 5/25/17
+# 16+1.7320508075688772j ['16+1.7320508075688772j']
+# 16 + 1.7320508075688772 j ['16+1.7320508075688772j']
+# 7-12i ['7-12j']
+# 14+2i ['14+2j']
+# win no complex numbers
+# (7-12i)*(14+2i) ['7-12j', '14+2j']
+
+
+comp_test_re = re.compile(r'\d[ij]', flags=re.I)
+
+comp_coeff = [r'\d+', r'\d+\.\d*', r'']
+
+comp_reg_list = [x + r'[+-]' + y + r'[ij]'
+                 if x != ''
+                 else
+                 y + r'[ij]'
+                 for x, y
+                 in product(comp_coeff, repeat=2)
+                 ]
+
+c_r_l_n = comp_reg_list.index(r'[ij]')
+
+comp_reg_list[c_r_l_n] = r'[^a-zA-z]' + comp_reg_list[c_r_l_n]
+
+comp_reg = '|'.join(comp_reg_list)
+
+comp_re = re.compile(comp_reg, flags=re.I)
+
+
+def find_complex(expr):
+    expr_out = expr.replace(' ', '')
+    expr_out = expr_out.upper()
+    # test = complex_test_re.search(expr_out) is None
+    # print(expr_out, test)
+    if comp_test_re.search(expr_out) is None:
+        print(expr, 'no complex numbers')
+    else:
+        # print(expr)
+        comp_num = comp_re.findall(expr_out)
+        # print(type(comp_num))
+        comp_num = [re.sub(r'[iIJ]', 'j', x) for x in comp_num]
+        print(expr, comp_num)
 
 
 if __name__ == '__main__':
     # print(func_mapper)
     for text in complex_strings:
-        match_obj = complex_re.search(text)
-        if match_obj is None:
-            continue
-        else:
-            print(match_obj.group())
+        find_complex(text)
