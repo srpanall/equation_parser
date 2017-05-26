@@ -24,31 +24,45 @@ from equation_parser import disp_ans
 # neg_base2 = '8-3^2'
 # disp_ans(neg_base2)
 
-# 5/23/17 neg_base2
-# 8-3^2 = -1
+# # 5/23/17 neg_base2
+# # 8-3^2 = -1
 
 # neg_base3 = '8-(-3)^2'
 # disp_ans(neg_base3)
 
-# 5/23/17  neg_base3
-# 8-(-3)^2 = -1
+# # 5/23/17  neg_base3
+# # 8-(-3)^2 = -1
 
 # neg_base4 = '8--3^2'
 # disp_ans(neg_base4)
 
-# 5/23/17  neg_base4
-# 8--3^2 = 17
+# # 5/23/17  neg_base4
+# # 8--3^2 = 17
 
-neg_base = '-3^0.5'
-disp_ans(neg_base)
+# exp1_list = ['5+sin(4*6(3-5))', '5+SIN(4*6(3-5))', '5+Sin(4*6(3-5))']
+
+# for text in exp1_list:
+#     disp_ans(text)
+
+#############################################################################
+# Have issues:
+
+# neg_base = '-3^0.5'
+# disp_ans(neg_base)
 
 # 5/22/17 neg_base = '-3^0.5'
 # -3^0.5 = (1.0605752387249068e-16+1.7320508075688772j)
+#  Issue: real term should be 0
 
-complex_1 = '5+3j * 7'
-disp_ans(complex_1)
+# complex_1 = '5+3j * 7'
+# disp_ans(complex_1)
 
 # 5/23/17 complex_1 = 5+3j * 7
 # AttributeError: 'complex' object has no attribute 'replace'
 # complex_1 = '5+3j * 7'
 # TypeError: can't multiply sequence by non-int of type 'str'
+
+# complex_prod = '(7-12i)*(14+2i)'
+# disp_ans(complex_prod)
+# 5/26/17 complex_prod
+# IndexError: list index out of range

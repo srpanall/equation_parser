@@ -118,8 +118,8 @@ def id_paren(expr):
 
 
 def id_funct(expr):
-    '''returns the expression after replacing all parentheses and their
-    content with underscores'''
+    '''returns the expression after replacing all functions and their
+    arguments with ` '''
     expr_out = expr
 
     for item in sorted_func:
@@ -368,11 +368,15 @@ def eval_ready(array):
 
 def atomizer(chunks):
     terms = []
+    # print(chunks)
     for item in chunks:
+        # print(item)
         if item[0] == 'PARENS':
             terms += [atomizer(item[1])]
         elif item[0] == 'FUNC':
             f_term = atomizer(item[1][1])
+            # print('item', type(item), item)
+            # print(func_mapper[item[1][0]])
             terms += [func_mapper[item[1][0]](f_term)]
         else:
             terms += [item[1]]
@@ -394,7 +398,7 @@ def evaluate(expr):
     if isinstance(answer, frac.Fraction):
         answer = float(answer)
 
-    print(answer, type(answer))
+    # print(answer, type(answer))
 
     return answer
 
@@ -404,8 +408,13 @@ def disp_ans(expr):
 
 
 if __name__ == '__main__':
-    neg_base = '-3^0.5'
-    disp_ans(neg_base)
+    exp1 = '5+sin(4*6(3-5))'
+    disp_ans(exp1)
 
-    neg_base2 = '8-3^2'
-    disp_ans(neg_base2)
+    exp1a = '5+sin(-4)'
+    disp_ans(exp1a)
+    # neg_base = '-3^0.5'
+    # disp_ans(neg_base)
+
+    # neg_base2 = '8-3^2'
+    # disp_ans(neg_base2)
