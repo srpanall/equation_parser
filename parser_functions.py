@@ -12,8 +12,6 @@ from itertools import product
 # from pprint import pprint
 
 
-
-
 def func_abs(x):
     return abs(x)
 
@@ -153,7 +151,7 @@ token_re = re.compile(tok_reg)
 
 
 complex_strings = ['16+1.7320508075688772j', '16 + 1.7320508075688772 j',
-                   '7-12i', '14+2i', 'win', '(7-12i)*(14+2i)']
+                   '7-12i', '14+2i', 'win', '(7-12i)*(14+2i)', '3iii']
 
 # 5/25/17
 # 16+1.7320508075688772j ['16+1.7320508075688772j']
@@ -164,7 +162,7 @@ complex_strings = ['16+1.7320508075688772j', '16 + 1.7320508075688772 j',
 # (7-12i)*(14+2i) ['7-12j', '14+2j']
 
 
-comp_test_re = re.compile(r'\d[ij]', flags=re.I)
+comp_test_re = re.compile(r'\d[ij]|[ij]\d|i+|j+', flags=re.I)
 
 comp_coeff = [r'\d+', r'\d+\.\d*', r'']
 
@@ -192,9 +190,11 @@ comp_reg_list2 = ['(' + x + r'[+-]' + y + r'[ij])'
                   in product(comp_coeff, repeat=2)
                   ]
 
-c_r_l_n2 = comp_reg_list2.index(r'([ij])')
+comp_reg_list2.remove(r'([ij])')
 
-comp_reg_list2[c_r_l_n] = r'([^a-zA-z][ij])'
+comp_reg_list2 += [r'([^a-zA-z][ij])', r'([ij][^a-zA-z])',
+                   r'([^a-zA-z][ij][^a-zA-z])', r'(i+)', r'(j+)'
+                   ]
 
 comp_reg2 = '|'.join(comp_reg_list2)
 
