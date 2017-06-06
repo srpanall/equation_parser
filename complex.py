@@ -23,7 +23,7 @@ i_coeff_list = [r'([+-])?(\d+\.\d*|\d+)(i+|j+)(\d+\.\d*|\d+)',
                 r'([+-])(i+|j+)(\W)'
                 ]
 
-i_bad = r'([+-])?(\d+\.\d*|\d+)?(i+|j+)(\d+\.\d*|\d+)?'
+i_bad = r'(\d+\.\d*|\d+)?([+-])?(\d+\.\d*|\d+)?(i+|j+)(\d+\.\d*|\d+)?'
 
 i_update = r'(\d+\.\d*|\d+)([+-])?(\d+\.\d*|\d+)?(j+)(\d+\.\d*|\d+)?'
 # ,
@@ -46,12 +46,100 @@ i_bad_reg = re.compile(i_bad, flags=re.I)
 
 i_update_reg = re.compile(i_update)
 
+
 def find_complex(expr):
     expr_out = expr.replace(' ', '')
     if comp_test_re.search(expr_out) is None:
         print(expr, 'no complex numbers')
     else:
         print(expr)
+
+
+def ij_update(expr):
+    items = [x for x in i_bad_reg.split(temp_text)
+             if x is not None and x != '']
+    items_out = []
+    for item in items:
+        if item[0] in ['i', 'I', 'J']:
+            n = item.count(item[0])
+            upd_item = n * 'j'
+            items_out += [upd_item]
+        else:
+            items_out += [item]
+
+    return ''.join(items_out)
+
+def update_i_coeff(matchobj):
+    print(matchobj.groups())
+
+
+def expr_update(expr):
+    upd_expr = i_update_reg.sub(update_i_coeff, expr)
+    upd_expr = re.split(r'(\([^\)]*\))', expr)
+
+    c = ''
+    expr_out = []
+
+    for item in upd_expr:
+        if item[0] == '(':
+            try:
+                c = complex(item[1:-1])
+            except ValueError:
+                c = expr_update(item[1:-1])
+                while type(c) is not complex:
+                    c = expr_update(c)
+
+            expr_out += [c]
+        elif item.count('j') != 0:
+            try:
+                c = complex(item)
+            except ValueError:
+                c = expr_update(item)
+                while type(c) is not complex:
+                    c = expr_update(c)
+            expr_out += [item]
+
+    item_type = []
+
+    for item in expr_out:
+        if type(item) in [complex, float]:
+            item_type += ['n']
+        elif item in ['*', '/']:
+            item_type += ['md']
+
+
+
+
+
+
+        c = re.split(r'(\([^\)]*\))', temp_text)
+
+
+    # j_loc = 0
+    # p_loc = []
+    # for n, item in enumerate(expr):
+    #     if item[0].isdigit():
+    #         upd_expr += [float(item)]
+    #         continue
+    #     if item[0] == 'j':
+    #         j_loc = n
+    #     elif item[0] == '(':
+    #         p_loc += n
+    #     elif item[0] == ')':
+    #         p_loc += n
+    #     upd_expr += item
+
+    # if p_loc > 2 or p_loc[0] != 0 or len(upd_expr[p_loc[1]]) > 1:
+    #     pass
+
+
+
+
+
+
+
+
+
 
 
 # def j_val_update(val, n):
@@ -78,25 +166,39 @@ def find_complex(expr):
 #                 val *= float(item)
 #         print(text, val)
 
-# for text in complex_strings:
-#     temp_text = text.replace(' ', '')
 
-#     if comp_test_re.search(temp_text) is None:
-#         print('%s no complex numbers' % text)
-#         continue
+for text in complex_strings:
+    temp_text = text.replace(' ', '')
 
-#     c = ''
-#     counter = 0
+    if comp_test_re.search(temp_text) is None:
+        print('%s contains no complex numbers' % text)
+        continue
 
-#     while type(c) is not complex and counter < 10:
-#         try:
-#             c = complex(temp_text)
-#         except ValueError:
-#             temp_text = i_bad_reg.sub(r'\1\2j\4', temp_text)
-#             counter += 1
+    c = ''
 
-#     print(text, c)
-complex_strings_2 = [i_bad_reg.sub(r'\1\2j\4', x) for x in complex_strings]
+# fix complex in while loop
+    # counter = 0
 
-for upd_str in complex_strings_2:
-    print(i_update_reg.split(upd_str))
+    # while type(c) is not complex and counter < 10:
+    #     try:
+    #         c = complex(temp_text)
+    #     except ValueError:
+    #         temp_text = i_bad_reg.sub(r'\1\2j\4', temp_text)
+    #         counter += 1
+    
+    if temp_text.count('j') == 0:
+        temp_text = ij_update(temp_text)
+
+    try:
+        c = complex(temp_text)
+    except ValueError:
+        c = re.split(r'(\([^\)]*\))', temp_text)
+
+
+    print(text, c)
+
+
+# complex_strings_2 = [i_bad_reg.sub(r'\1\2j\4', x) for x in complex_strings]
+
+# for upd_str in complex_strings_2:
+#     print(i_update_reg.split(upd_str))
