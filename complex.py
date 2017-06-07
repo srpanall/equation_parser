@@ -23,8 +23,6 @@ i_coeff_list = [r'([+-])?(\d+\.\d*|\d+)(i+|j+)(\d+\.\d*|\d+)',
                 r'([+-])(i+|j+)(\W)'
                 ]
 
-i_bad = r'(\d+\.\d*|\d+)?([+-])?(\d+\.\d*|\d+)?(i+|j+)(\d+\.\d*|\d+)?'
-
 i_update = r'(\d+\.\d*|\d+)([+-])?(\d+\.\d*|\d+)?(j+)(\d+\.\d*|\d+)?'
 # ,
 #          r'([+-])?(\d+\.\d*|\d+)(i+|j+)',
@@ -42,6 +40,7 @@ i_coeff_re = re.compile(i_coeff_reg, flags=re.I)
 
 # i_bad_reg = re.compile(i_bad_re, flags=re.I)
 
+i_bad = r'(\d+\.\d*|\d+)?([+-])?(\d+\.\d*|\d+)?(i+|j+)(\d+\.\d*|\d+)?'
 i_bad_reg = re.compile(i_bad, flags=re.I)
 
 i_update_reg = re.compile(i_update)
@@ -56,7 +55,7 @@ def find_complex(expr):
 
 
 def ij_update(expr):
-    items = [x for x in i_bad_reg.split(temp_text)
+    items = [x for x in i_bad_reg.split(expr)
              if x is not None and x != '']
     items_out = []
     for item in items:
@@ -68,6 +67,7 @@ def ij_update(expr):
             items_out += [item]
 
     return ''.join(items_out)
+
 
 def update_i_coeff(matchobj):
     print(matchobj.groups())
@@ -107,13 +107,7 @@ def expr_update(expr):
         elif item in ['*', '/']:
             item_type += ['md']
 
-
-
-
-
-
         c = re.split(r'(\([^\)]*\))', temp_text)
-
 
     # j_loc = 0
     # p_loc = []
@@ -131,16 +125,6 @@ def expr_update(expr):
 
     # if p_loc > 2 or p_loc[0] != 0 or len(upd_expr[p_loc[1]]) > 1:
     #     pass
-
-
-
-
-
-
-
-
-
-
 
 # def j_val_update(val, n):
 #     if n == 1:
@@ -176,16 +160,6 @@ for text in complex_strings:
 
     c = ''
 
-# fix complex in while loop
-    # counter = 0
-
-    # while type(c) is not complex and counter < 10:
-    #     try:
-    #         c = complex(temp_text)
-    #     except ValueError:
-    #         temp_text = i_bad_reg.sub(r'\1\2j\4', temp_text)
-    #         counter += 1
-    
     if temp_text.count('j') == 0:
         temp_text = ij_update(temp_text)
 
@@ -193,7 +167,6 @@ for text in complex_strings:
         c = complex(temp_text)
     except ValueError:
         c = re.split(r'(\([^\)]*\))', temp_text)
-
 
     print(text, c)
 
