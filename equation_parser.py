@@ -1,7 +1,7 @@
 
 import re
 # import os
-# from pprint import pprint
+from pprint import pprint
 import numpy as np
 import fractions as frac
 from parser_functions import *
@@ -375,9 +375,9 @@ def atomizer(chunks):
             terms += [atomizer(item[1])]
         elif item[0] == 'FUNC':
             f_term = atomizer(item[1][1])
-            # print('item', type(item), item)
+            # print(['item', type(item), item])
             # print(func_mapper[item[1][0]])
-            terms += [func_mapper[item[1][0]](f_term)]
+            terms += [func_mapper[item[1][0].upper()](f_term)]
         else:
             terms += [item[1]]
 

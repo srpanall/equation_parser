@@ -91,7 +91,7 @@ for n in range(num_eqn):
     except TypeError:
         print(lhs)
 
-    # print(lhs, ' = ', rhs)
+    print(lhs, ' = ', rhs)
 
 # pprint(equations)
 # pprint(eval_expr)

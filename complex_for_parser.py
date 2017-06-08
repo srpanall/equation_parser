@@ -1,5 +1,13 @@
+
+#######################################
+#
+# Updte functions to work in main parser program.
+#
+#
+#######################################
+
 import re
-from pprint import pprint
+# from pprint import pprint
 
 
 complex_strings = ['3jjj', '16+1.732050j8.075688772', '7-12j',
@@ -37,7 +45,7 @@ def update_i_coeff(matchobj):
     return upd_parts
 
 
-def type_terms(array):
+def comp_term_type(array):
     type_out = ''
     # print('array', array)
     for n, term in enumerate(array):
@@ -54,10 +62,11 @@ def expr_update(expr):
 
     else:
         upd_expr = multi_i_reg.sub(fix_im, upd_expr)
-        matchobj = i_update_reg.search(upd_expr)
-        expr_terms = update_i_coeff(matchobj)
+        return upd_expr
+        # matchobj = i_update_reg.search(upd_expr)
+        # expr_terms = update_i_coeff(matchobj)
 
-        return eval_complex(expr_terms)
+        # return eval_complex(expr_terms)
 
 
 def eval_complex(expr_terms):
@@ -75,7 +84,7 @@ def eval_complex(expr_terms):
     elif num_terms == 1:
         c_out = expr_terms[0]
     else:
-        terms = re.split(r'(o\d)', type_terms(expr_terms))
+        terms = re.split(r'(o\d)', comp_term_type(expr_terms))
         # print(terms)
         new_terms = []
 
@@ -109,10 +118,11 @@ complex_string2 = ['16+1.7320508075688772j', '16 + 1.7320508075688772 j',
 
 
 def fix_im(matchobj):
-    # print(matchobj.groups())
+    print(matchobj.groups())
     text_in = [x for x in matchobj.groups()]
     n_j = text_in[1].count(text_in[1][0])
     text_in[1] = 'j' * n_j
+
     return ''.join([x for x in text_in if x is not None])
 
 
