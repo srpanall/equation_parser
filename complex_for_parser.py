@@ -16,7 +16,7 @@ complex_strings = ['3jjj', '16+1.732050j8.075688772', '7-12j',
 i_update = r'(\d+\.\d*|\d+)([+-])?(\d+\.\d*|\d+)?(j+)(\d+\.\d*|\d+)?'
 i_update_reg = re.compile(i_update)
 
-multiple_i = r'(\d+\.\d*|\d+)?(i+|j+)(\d+\.\d*|\d+)?'
+multiple_i = r'([+-])?(\d+\.\d*|\d+)?(i+|j+)(\d+\.\d*|\d+)?'
 multi_i_reg = re.compile(multiple_i, flags=re.I)
 
 comp_forms = [r'\d[ij]', r'[ij]\d', r'ii+', r'jj+', r'([^a-zA-z][ij])',
@@ -120,8 +120,17 @@ complex_string2 = ['16+1.7320508075688772j', '16 + 1.7320508075688772 j',
 def fix_im(matchobj):
     print(matchobj.groups())
     text_in = [x for x in matchobj.groups()]
-    n_j = text_in[1].count(text_in[1][0])
-    text_in[1] = 'j' * n_j
+    n_j = text_in[1].count(text_in[2][0])
+    factors = [float(x) if x is not None else 1 for x in [text_in[1], text_in[3]]]
+
+    if text_in[0] == '-':
+    	sign = -1
+    else:
+    	sign = 1
+
+    prod_out = sign * factors[0] * factors[1] * 1j ** n_j
+
+    
 
     return ''.join([x for x in text_in if x is not None])
 
