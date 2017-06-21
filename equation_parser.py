@@ -1,7 +1,7 @@
 
 import re
 # import os
-# from pprint import pprint
+from pprint import pprint
 import numpy as np
 import fractions as frac
 from parser_functions import *
@@ -76,11 +76,14 @@ def make_mult_explicit(expr):
     else:
         exp_1 = expr
 
-    exp_2 = mult_re.sub(r'\1*\2', expr)
+    exp_2 = mult_re.subn(r'\1*\2', exp_1)[0]
 
-    while exp_1 != exp_2:
-        exp_1 = exp_2
-        exp_2 = comma_re.sub(r'\1*\2', exp_1)
+    if exp_2.count(')(') != 0:
+        exp_2 = re.subn(r'(\))(\()', ')*(', exp_2)[0]
+
+    # while exp_1 != exp_2:
+    #     exp_1 = exp_2
+    #     exp_2 = comma_re.sub(r'\1*\2', exp_1)
 
     return exp_2
 
@@ -93,6 +96,8 @@ def initial_prep(expr):
     expr_out = remove_comma_format(expr_out)
     expr_out = remove_double_parens(expr_out)
     expr_out = make_mult_explicit(expr_out)
+
+    # print(expr_out)
 
     return expr_out
 
@@ -118,8 +123,8 @@ def id_paren(expr):
 
 
 def id_funct(expr):
-    '''returns the expression after replacing all parentheses and their
-    content with underscores'''
+    '''returns the expression after replacing all functions and their
+    arguments with ` '''
     expr_out = expr
 
     for item in sorted_func:
@@ -368,12 +373,16 @@ def eval_ready(array):
 
 def atomizer(chunks):
     terms = []
+    # print(chunks)
     for item in chunks:
+        # print(item)
         if item[0] == 'PARENS':
             terms += [atomizer(item[1])]
         elif item[0] == 'FUNC':
             f_term = atomizer(item[1][1])
-            terms += [func_mapper[item[1][0]](f_term)]
+            # print(['item', type(item), item])
+            # print(func_mapper[item[1][0]])
+            terms += [func_mapper[item[1][0].upper()](f_term)]
         else:
             terms += [item[1]]
 
@@ -394,7 +403,7 @@ def evaluate(expr):
     if isinstance(answer, frac.Fraction):
         answer = float(answer)
 
-    print(answer, type(answer))
+    # print(answer, type(answer))
 
     return answer
 
@@ -404,8 +413,14 @@ def disp_ans(expr):
 
 
 if __name__ == '__main__':
-    neg_base = '-3^0.5'
-    disp_ans(neg_base)
+    exp1 = '8 - 2(2)(3)'
+    disp_ans(exp1)
 
-    neg_base2 = '8-3^2'
-    disp_ans(neg_base2)
+    exp2 = '8 - 2*2*3'
+    disp_ans(exp2)
+
+    # neg_base = '-3^0.5'
+    # disp_ans(neg_base)
+
+    # neg_base2 = '8-3^2'
+    # disp_ans(neg_base2)

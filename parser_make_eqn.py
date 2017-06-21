@@ -89,9 +89,11 @@ for n in range(num_eqn):
         if abs(lhs_val - rhs) < 10 ** -10:
             eval_expr += [[lhs, lhs_val, rhs]]
     except TypeError:
-        print(lhs)
+        print()
+        print('ERROR', lhs)
+        print()
 
-    # print(lhs, ' = ', rhs)
+    print(lhs, ' = ', rhs)
 
 # pprint(equations)
 # pprint(eval_expr)
