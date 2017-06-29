@@ -1,9 +1,10 @@
 
 import re
 # import os
-from pprint import pprint
-import numpy as np
+# from pprint import pprint
+import operator
 import fractions as frac
+import numpy as np
 from parser_functions import *
 
 # ### Preparing the Expression
@@ -14,7 +15,7 @@ def find_all_parens(expression):
     as [lp_pos,rp_pos]'''
 
     paren_info = [[x.group(), x.start(), x.end()]
-                  for x in re.finditer('\([^\(\)]+\)', expression)]
+                  for x in re.finditer(r'\([^\(\)]+\)', expression)]
     exprs = [x[0] for x in paren_info]
     paren_loc = [[x[1], x[2]] for x in paren_info]
 
@@ -125,9 +126,9 @@ def id_funct(expr):
     for item in sorted_func:
         while expr_out.count(item) != 0:
             match = re.search(item, expr_out, re.I)
-            x, y = match.span()
+            expr_start, expr_end = match.span()
             paren_loc = find_all_parens(expr_out)
-            old = expr_out[x: paren_loc[y]]
+            old = expr_out[expr_start: paren_loc[expr_end]]
             expr_out = expr_out.replace(old, '`' * len(old))
 
     return expr_out
@@ -145,13 +146,14 @@ def token_prep(expr):
 # ### Chunk Functions
 
 
-def op_chunk(expr, tupe):
-    return tupe[1]
+def op_chunk(*tupe):
+    '''Returns the binary operator in the chunk'''
+    return tupe[1][1]
 
 
-def num_chunk(expr, tupe):
+def num_chunk(*tupe):
     '''converts number from string to numerical value'''
-    num = tupe[1]
+    num = tupe[1][1]
     if num.count('.') == 1:
         return float(num)
     return int(num)
@@ -161,7 +163,7 @@ def func_chunk(expr, tupe):
     '''Returns a list of the form [mathematical function, argument]'''
     func_in = expr[tupe[2]:tupe[3]]
 
-    func = re.match('[A-Za-z]+\(', func_in).group()
+    func = re.match(r'[A-Za-z]+\(', func_in).group()
     func_out = func[:-1]
     x_val = func_in[len(func): -1]
 
@@ -169,31 +171,34 @@ def func_chunk(expr, tupe):
 
 
 def paren_chunk(expr, tupe):
+    '''Recursively chunks the contents of the parentheses in the expression'''
     return chunk_expr(expr[tupe[2] + 1:tupe[3] - 1])
 
 
-def other_chunk(expr, tupe):
-    return tupe[1]
+def other_chunk(*tupe):
+    '''Returns any unknown word, serves to identify unknown functions'''
+    return tupe[1][1]
 
 
-def lrp_chunk(expr, tupe):
-    pass
+# def lrp_chunk(*tupe):
+#     return tupe[1][1]
 
 
-def pi_chunk(expr, tupe):
+def pi_chunk(*tupe):
+    '''Returns pi if present'''
     return np.pi
 
 # dictionary mapping chunk type to appropriate function
 
 
-d_chunk = {
+DCHUNK = {
     'NEGNUM': num_chunk,
     'NUMBER': num_chunk,
     'FUNC': func_chunk,
     'OP': op_chunk,
     'PARENS': paren_chunk,
     'OTHER': other_chunk,
-    'LRP': lrp_chunk,
+    # 'LRP': lrp_chunk,
     'PI': pi_chunk,
 }
 
@@ -206,28 +211,28 @@ def tokenize(code):
     position in the string'''
     dict_kinds = {'FUNC': '`', 'PARENS': '(_)'}
 
-    for mo in token_re.finditer(code):
-        kind = mo.lastgroup
+    for mobj in token_re.finditer(code):
+        kind = mobj.lastgroup
 
         if kind in dict_kinds:
             value = dict_kinds[kind]
         else:
-            value = mo.group(kind)
+            value = mobj.group(kind)
         if kind == 'MISMATCH':
             raise RuntimeError('%r unexpected in %s' % (value, code))
         else:
-            start, end = mo.span()
+            start, end = mobj.span()
             yield Token(kind, value, start, end)
 
 
 def chunk_expr(expr):
-    '''Reduces the complexity of the expression inside a set of parentheses
-    or the argument of a function and returns a list of chunks'''
+    '''Parses the expression and returns a list of numbers, binary operators,
+    '''
     mod_expr = token_prep(expr)
 
-    tokens = [x for x in tokenize(mod_expr)]
+    tokens = [token for token in tokenize(mod_expr)]
 
-    chunks = [[x[0], d_chunk[x[0]](expr, x)] for x in tokens]
+    chunks = [[token[0], DCHUNK[token[0]](expr, token)] for token in tokens]
 
     return chunks
 
@@ -237,76 +242,68 @@ def chunk_expr(expr):
 
 def decimal_place_counter(number):
     '''Returns the number of digits to the right of the decimal point'''
-    n = str(number)
-    if n.count('.') == 0:
-        return(0)
+    num_str = str(number)
+    if num_str.count('.') == 0:
+        return 0
     else:
-        return len(n) - 1 - n.index('.')
+        return len(num_str) - 1 - num_str.index('.')
 
 
-def sig_figs(a, b, c, op):
+def eval_bin_expr(num_1, num_2, bin_op):
     '''returns c with the appropriate number of digits in an effort to avoid
     floating point error'''
-    place_a = decimal_place_counter(a)
-    place_b = decimal_place_counter(b)
-    place_c = decimal_place_counter(c)
 
-    if op == '*':
-        r_place = place_a * place_b
+    if bin_op == '/':
+        if isinstance(num_1, int) and isinstance(num_2, int):
+            return frac.Fraction(num_1, num_2)
+        return num_1 / num_2
+
+    num_3 = BIN_OP_DICT[bin_op](num_1, num_2)
+
+    num_1_places = decimal_place_counter(num_1)
+    num_2_places = decimal_place_counter(num_2)
+    num_3_places = decimal_place_counter(num_3)
+
+    if bin_op == '*':
+        r_places = num_1_places * num_2_places
     else:
-        r_place = max(place_a, place_b)
+        r_places = max(num_1_places, num_2_places)
 
-    if place_c <= r_place:
-        return c
+    if num_3_places <= r_places:
+        return num_3
     else:
-        str_c = str(c)
-        new_c = str_c[:len(str_c) - r_place]
+        str_num_3 = str(num_3)
+        new_num_3 = str_num_3[:len(str_num_3) - r_places]
 
-    if new_c.count('.') == 1:
-        return float(new_c)
+    if new_num_3.count('.') == 1:
+        return float(new_num_3)
     else:
-        return int(new_c)
+        return int(new_num_3)
 
 
-def d_plus(a, b):
-    c = a + b
-    if isinstance(c, int):
-        return c
-    else:
-        return sig_figs(a, b, c, '+')
-
-
-def d_minus(a, b):
-    c = a - b
-    if isinstance(c, int):
-        return c
-    else:
-        return sig_figs(a, b, c, '-')
-
-
-def d_times(a, b):
-    c = a * b
-    if isinstance(c, int):
-        return c
-    else:
-        return sig_figs(a, b, c, '*')
-
-
-def d_divide(a, b):
-    if isinstance(a, int) and isinstance(b, int):
-        return frac.Fraction(a, b)
-    return a / b
-
-
-bin_op_dict = {
-    '+': d_plus,
-    '-': d_minus,
-    '*': d_times,
-    '/': d_divide
+BIN_OP_DICT = {
+    '+': operator.add,
+    '-': operator.sub,
+    '*': operator.mul,
 }
 
 
+def eval_a_op_b(terms, op_1, op_2):
+    '''performs the first calculation according to the order
+    of operations in the terms'''
+    index_1 = first_index(terms, op_1, op_2)
+    num_1, num_2 = terms[index_1 - 1], terms[index_1 + 1]
+    bin_op = terms[index_1]
+
+    terms[index_1 - 1] = eval_bin_expr(num_1, num_2, bin_op)
+
+    del terms[index_1: index_1 + 2]
+
+    return terms
+
+# Rewrite using a regex
 def first_index(terms, op_1, op_2):
+    '''determines'''
     if terms.count(op_1) != 0:
         i_1 = terms.index(op_1)
     else:
@@ -331,15 +328,6 @@ def eval_expon(terms):
     del expr_terms[i: i + 2]
 
     return expr_terms
-
-
-def eval_a_op_b(terms, op_1, op_2):
-    i = first_index(terms, op_1, op_2)
-    terms[i - 1] = bin_op_dict[terms[i]](terms[i - 1], terms[i + 1])
-
-    del terms[i: i + 2]
-
-    return terms
 
 
 def evaluate_terms(terms):
@@ -408,11 +396,15 @@ def disp_ans(expr):
 
 
 if __name__ == '__main__':
-    exp1 = '5+sin(4*6(3-5))'
-    disp_ans(exp1)
+    EXP1 = '5+sin(4*6(3-5))'
+    disp_ans(EXP1)
 
-    exp1a = '5+sin(-4)'
-    disp_ans(exp1a)
+    EXP2 = '5+sin(-4)'
+    disp_ans(EXP2)
+
+    EXP3 = '4*6(3-5)'
+    disp_ans(EXP3)
+
     # neg_base = '-3^0.5'
     # disp_ans(neg_base)
 

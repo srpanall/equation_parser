@@ -137,7 +137,7 @@ token_specification = [
     ('OP', r'[+\-*/\^]'),           # Arithmetic operators
     ('PARENS', r'\(_+\)'),          # Parenthetical terms
     ('OTHER', r'[A-Za-z]+'),        # Any other words
-    ('LRP', r'[\(\)]'),             # Any parentheses
+    # ('LRP', r'[\(\)]'),             # Any parentheses
     ('MISMATCH', r'.'),             # Any other character
 ]
 
