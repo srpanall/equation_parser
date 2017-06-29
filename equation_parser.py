@@ -1,9 +1,9 @@
 
 import re
 # import os
-from pprint import pprint
-import numpy as np
+# from pprint import pprint
 import fractions as frac
+import numpy as np
 from parser_functions import *
 
 # ### Preparing the Expression
@@ -14,7 +14,7 @@ def find_all_parens(expression):
     as [lp_pos,rp_pos]'''
 
     paren_info = [[x.group(), x.start(), x.end()]
-                  for x in re.finditer('\([^\(\)]+\)', expression)]
+                  for x in re.finditer(r'\([^\(\)]+\)', expression)]
     exprs = [x[0] for x in paren_info]
     paren_loc = [[x[1], x[2]] for x in paren_info]
 
@@ -161,7 +161,7 @@ def func_chunk(expr, tupe):
     '''Returns a list of the form [mathematical function, argument]'''
     func_in = expr[tupe[2]:tupe[3]]
 
-    func = re.match('[A-Za-z]+\(', func_in).group()
+    func = re.match(r'[A-Za-z]+\(', func_in).group()
     func_out = func[:-1]
     x_val = func_in[len(func): -1]
 
@@ -239,7 +239,7 @@ def decimal_place_counter(number):
     '''Returns the number of digits to the right of the decimal point'''
     n = str(number)
     if n.count('.') == 0:
-        return(0)
+        return 0
     else:
         return len(n) - 1 - n.index('.')
 
