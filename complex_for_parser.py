@@ -1,7 +1,7 @@
 
 #######################################
 #
-# Updte functions to work in main parser program.
+# Update functions to work in main parser program.
 #
 #
 #######################################
@@ -118,25 +118,30 @@ complex_string2 = ['16+1.7320508075688772j', '16 + 1.7320508075688772 j',
 
 
 def fix_im(matchobj):
-    print(matchobj.groups())
-    text_in = [x for x in matchobj.groups()]
-    n_j = text_in[1].count(text_in[2][0])
-    factors = [float(x) if x is not None else 1 for x in [text_in[1], text_in[3]]]
+    # print(matchobj.groups())
+    txt = [x for x in matchobj.groups()]
+    n_j = txt[2].count(txt[2][0])
+    factors = [float(x) if x is not None else 1 for x in [txt[1], txt[3]]]
 
-    if text_in[0] == '-':
-    	sign = -1
+    if txt[0] == '-':
+        sign = -1
     else:
-    	sign = 1
+        sign = 1
 
-    prod_out = sign * factors[0] * factors[1] * 1j ** n_j
+    com_num = sign * factors[0] * factors[1] * 1j ** n_j
 
-    
+    im_coeff = com_num.imag
 
-    return ''.join([x for x in text_in if x is not None])
+    if im_coeff > 0:
+        return '+' + str(im_coeff) + 'j'
+    else:
+        return str(im_coeff) + 'j'
+
+    # return ''.join([x for x in txt if x is not None])
 
 
 for c_s in complex_string2:
     c_val = expr_update(c_s)
     print(c_s, '=', c_val)
     # c_s_upd = c_s.replace(" ", "")
-    # print(c_s, multi_i_reg.sub(fix_im, c_s_upd))
+    # print(c_s, '=', multi_i_reg.sub(fix_im, c_s_upd))
