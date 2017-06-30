@@ -77,11 +77,14 @@ def make_mult_explicit(expr):
     else:
         exp_1 = expr
 
-    exp_2 = mult_re.sub(r'\1*\2', expr)
+    exp_2 = mult_re.subn(r'\1*\2', exp_1)[0]
 
-    while exp_1 != exp_2:
-        exp_1 = exp_2
-        exp_2 = comma_re.sub(r'\1*\2', exp_1)
+    if exp_2.count(')(') != 0:
+        exp_2 = re.subn(r'(\))(\()', ')*(', exp_2)[0]
+
+    # while exp_1 != exp_2:
+    #     exp_1 = exp_2
+    #     exp_2 = comma_re.sub(r'\1*\2', exp_1)
 
     return exp_2
 
@@ -94,6 +97,8 @@ def initial_prep(expr):
     expr_out = remove_comma_format(expr_out)
     expr_out = remove_double_parens(expr_out)
     expr_out = make_mult_explicit(expr_out)
+
+    # print(expr_out)
 
     return expr_out
 
@@ -404,7 +409,13 @@ if __name__ == '__main__':
 
     EXP3 = '4*6(3-5)'
     disp_ans(EXP3)
+    
+    EXP4 = '8 - 2(2)(3)'
+    disp_ans(EXP4)
 
+    EXP5 = '8 - 2*2*3'
+    disp_ans(EXP5)
+    
     # neg_base = '-3^0.5'
     # disp_ans(neg_base)
 
