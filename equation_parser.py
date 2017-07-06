@@ -306,6 +306,7 @@ def eval_a_op_b(terms, op_1, op_2):
 
     return terms
 
+
 # Rewrite using a regex
 def first_index(terms, op_1, op_2):
     '''determines'''
@@ -409,13 +410,13 @@ if __name__ == '__main__':
 
     EXP3 = '4*6(3-5)'
     disp_ans(EXP3)
-    
+
     EXP4 = '8 - 2(2)(3)'
     disp_ans(EXP4)
 
     EXP5 = '8 - 2*2*3'
     disp_ans(EXP5)
-    
+
     # neg_base = '-3^0.5'
     # disp_ans(neg_base)
 
