@@ -5,18 +5,37 @@ from pprint import pprint
 func_reg = re.compile(r'def ([^\(]+)')
 
 
-def find_function(file_name):
-    func_list_out = []
-    with open(file_name, 'r') as f:
-        for line in f:
-            name_obj = func_reg.match(line)
-            if name_obj is not None:
-                func_list_out += [name_obj.group()]
+def find_funcs_2(file_name):
+    funcs = [match_obj.group(1) for match_obj in
+             [func_reg.match(line) for line in open(file_name)]
+             if match_obj is not None]
 
-    return func_list_out
+    return funcs
 
 
-files = [[file, find_function(file)] for file in os.listdir()
-         if file.endswith('py')]
+files = [file for file in os.listdir() if file.endswith('py')]
 
-pprint(files)
+# print(files[2])
+
+# pprint(find_funcs_2(files[2]))
+
+
+def func_depend(func_names, file_text):
+    func_list = sorted(func_names, key=len, reverse=True)
+    func_reg = '|'.join(func_list)
+    func_re = re.compile(func_reg)
+
+
+    return func_list
+
+
+pprint(func_depend(find_funcs_2(files[2]), 4))
+
+
+# comp_reg_list2 += [r'([^a-zA-z][ij])', r'([ij][^a-zA-z])',
+#                    r'([^a-zA-z][ij][^a-zA-z])', r'(i+)', r'(j+)'
+#                    ]
+
+# comp_reg2 = '|'.join(comp_reg_list2)
+
+# comp_re2 = re.compile(comp_reg2, flags=re.I)

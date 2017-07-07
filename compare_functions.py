@@ -7,6 +7,8 @@ folder_path = r"C:\Users\gex02845\Desktop\Programing\New folder"
 old_file = 'complex.py'
 new_file = 'complex_for_parser.py'
 
+test_file = 'equation_parser.py'
+
 
 def list_defs(file):
     # path = os.path.join(folder_path, file + '.py')
@@ -38,6 +40,31 @@ def list_defs(file):
     return defs
 
 
+func_reg = re.compile(r'def ([^\(]+)')
+
+
+def list_func(file):
+    file_text = [line for line in open(file)]
+    defs = {}
+    func_name = ''
+    def_text = []
+
+    for line in file_text:
+        if func_name == '':
+            name_obj = func_reg.match(line)
+            if name_obj is not None:
+                func_name = name_obj.group(1)
+                def_text += [line]
+        elif line[0].isspace():
+            def_text += [line]
+        else:
+            defs[func_name] = def_text
+            func_name = ''
+            def_text = []
+
+    return defs
+
+
 def compare_functions(old, new):
     old_defs = list_defs(old)
     new_defs = list_defs(new)
@@ -63,6 +90,7 @@ def compare_functions(old, new):
     return diff_func
 
 
-test = compare_functions(old_file, new_file)
+# test = compare_functions(old_file, new_file)
+test = list_func(test_file)
 
 pprint(test)
