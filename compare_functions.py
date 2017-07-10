@@ -93,4 +93,4 @@ def compare_functions(old, new):
 # test = compare_functions(old_file, new_file)
 test = list_func(test_file)
 
-pprint(test)
+pprint(test.keys())
