@@ -307,7 +307,6 @@ def eval_a_op_b(terms, op_1, op_2):
     return terms
 
 
-# Rewrite using a regex
 def first_index(terms, op_1, op_2):
     '''determines'''
     if terms.count(op_1) != 0:
