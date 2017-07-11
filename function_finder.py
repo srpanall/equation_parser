@@ -4,24 +4,11 @@ from pprint import pprint
 
 def_re = re.compile(r'def ([^\(]+)')
 
-
-def find_funcs_2(file_name):
-    funcs = [match_obj.group(1) for match_obj in
-             [def_re.match(line) for line in open(file_name)]
-             if match_obj is not None]
-
-    return funcs
-
-
 files = [file for file in os.listdir() if file.endswith('py')]
-
-# print(files[2])
-
-
-# pprint(find_funcs_2(files[2]))
 
 
 def list_defs(file):
+    """Given a python file returns a dictionary function: definition"""
     text = [line for line in open(file) if line[0] != '#'and
             re.search('\w', line) is not None]
     defs = {}
@@ -48,6 +35,10 @@ def list_defs(file):
 
 
 def func_depend(file):
+    """Given a dictioanry containing functions and their definitions
+    returns a dictionary of functions and their first order dependents
+    in the form function: dependent functions
+    """
     funcs_with_text = list_defs(file)
     func_names = list(funcs_with_text.keys())
     func_list = sorted(func_names, key=len, reverse=True)
@@ -68,17 +59,37 @@ def func_depend(file):
     return depend_dict
 
 
-# pprint(func_depend(find_funcs_2(files[2]), 4))
+def all_depend(file):
+    """Given a python file returns a dictionary of the form 
+    function: all dependents.
 
-# funcs_list = list(list_defs(files[2]).keys())
+    If the function is recursive, the first entry in the value is 'self'.
+    """
+    depend_dict = func_depend(file)
+    def_list = [key for key, value in depend_dict.items() if value is not None]
+    d_out = {key: value for key, value in depend_dict.items() if value is None}
+
+    for func in def_list:
+        func_set = set(depend_dict[func])
+        test = False
+        d_out_val = []
+        temp_funcs = {func_name for func_name in func_set}
+
+        while not test:
+            set_len = len(temp_funcs)
+            for dep_func in func_set:
+                if depend_dict[dep_func] is not None:
+                    temp_funcs = temp_funcs | set(depend_dict[dep_func])
+            test = set_len == len(temp_funcs)
+
+        d_out_val = sorted(list(temp_funcs))
+
+        if func in d_out_val:
+            d_out_val = ['self'] + d_out_val
+            d_out_val.remove(func)
+        d_out[func] = d_out_val
+
+    return d_out
 
 
-pprint(func_depend(files[2]))
-
-# comp_reg_list2 += [r'([^a-zA-z][ij])', r'([ij][^a-zA-z])',
-#                    r'([^a-zA-z][ij][^a-zA-z])', r'(i+)', r'(j+)'
-#                    ]
-
-# comp_reg2 = '|'.join(comp_reg_list2)
-
-# comp_re2 = re.compile(comp_reg2, flags=re.I)
+pprint(all_depend(files[2]))
