@@ -60,7 +60,7 @@ def func_depend(file):
 
 
 def all_depend(file):
-    """Given a python file returns a dictionary of the form 
+    """Given a python file returns a dictionary of the form
     function: all dependents.
 
     If the function is recursive, the first entry in the value is 'self'.
@@ -92,4 +92,24 @@ def all_depend(file):
     return d_out
 
 
-pprint(all_depend(files[2]))
+def funcs_using(func_dict):
+    """Takes a dictionary of functions and their dependents and returns a
+    dictionary functions: functions using key.
+    """
+    func_w_dep = [key for key, value in func_dict.items() if value is not None]
+
+    list_depend = [set(func_dict[key]) for key in func_w_dep]
+    set_depend = list_depend[0]
+    for set_vals in list_depend[1:]:
+        set_depend |= set_vals
+
+    if 'self' in set_depend:
+        set_depend.remove('self')
+
+    dep_func = sorted(list(set_depend))
+
+    dep_out = {func : [caller for caller in func_w_dep if func in func_dict[caller]] for func in dep_func}
+
+    return dep_out
+
+pprint(funcs_using(all_depend(files[3])))

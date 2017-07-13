@@ -1,10 +1,11 @@
-"""Functions for formating expressions in the equation parser."""
+"""Functions for initial formating of expressions in the equation parser."""
 
 import re
 
 paren_re = re.compile(r'\([^\(\)]+\)')
 comma_re = re.compile(r'(\d)\,(\d\d\d)')
 mult_re = re.compile(r'(\d)(\()|(\d)([a-zA-Z])')
+# func_arg_re = re.compile(r'([a-zA-Z]+\(\d+,\d+\))')
 
 
 def find_all_parens(expression):
@@ -57,7 +58,7 @@ def remove_doub_ops(expr):
     return ud_expr
 
 
-# Need to address issue of comma being 2 arguments of a function
+# Need to address issue of comma seperating 2 arguments of a function
 
 
 def remove_comma_format(expr):
@@ -65,12 +66,25 @@ def remove_comma_format(expr):
     if expr.count(',') == 0:
         return expr
 
+    # funcs_w_args = []
+
+    # while func_arg_re.search(expr) is not None:
+    #     func_w_arg = func_arg_re.search(expr).group(0)
+    #     print(func_w_arg)
+    #     expr = expr.replace(func_w_arg, '_')
+    #     funcs_w_args += [func_w_arg]
+
+    # print(expr)
+
     exp_1 = expr
     exp_2 = comma_re.sub(r'\1\2', expr)
 
     while exp_1 != exp_2:
         exp_1 = exp_2
         exp_2 = comma_re.sub(r'\1\2', exp_1)
+
+    for item in funcs_w_args:
+        exp_2 = exp_2.replace('_', item)
 
     return exp_2
 
@@ -95,12 +109,21 @@ def initial_prep(expr):
     expr_out = expr.replace(' ', '')
     expr_out = expr_out.upper()
     expr_out = remove_doub_ops(expr_out)
-    expr_out = remove_comma_format(expr_out)
+    # expr_out = remove_comma_format(expr_out)
     expr_out = remove_double_parens(expr_out)
     expr_out = make_mult_explicit(expr_out)
 
     return expr_out
 
+
+# EXP2 = 'SIN(3,568)'
+# print(remove_comma_format(EXP2))
+
+# EXP3 = '456,789 * SIN(3,568)'
+# print(remove_comma_format(EXP3))
+
+# EXP4 = '456,789 * SIN(SIN(7)*3,568)'
+# print(remove_comma_format(EXP4))
 
 if __name__ == '__main__':
     EXP1 = '5+sin(4*6(3-5))'

@@ -416,6 +416,8 @@ if __name__ == '__main__':
     EXP5 = '8 - 2*2*3'
     disp_ans(EXP5)
 
+    EXPW = '7 + 3 + 1 + 3 + 5 + 3 + 1 +3 '
+    disp_ans(EXPW)
     # neg_base = '-3^0.5'
     # disp_ans(neg_base)
 
