@@ -71,3 +71,8 @@ def fix_im(matchobj):
 for c_s in complex_string2:
     c_val = expr_update_complex(c_s)
     print(c_s, '=', c_val)
+<<<<<<< HEAD
+=======
+    # c_s_upd = c_s.replace(" ", "")
+    # print(c_s, '=', multi_i_reg.sub(fix_im, c_s_upd))
+>>>>>>> master

@@ -3,6 +3,7 @@ import re
 import operator
 import fractions as frac
 
+
 # ### Evaluation functions
 
 
@@ -18,8 +19,8 @@ def decimal_place_counter(number):
 
 
 def eval_bin_expr(num_1, num_2, bin_op):
-    """Given LHS of  num_1 _ num_2 = c returns c with the appropriate
-    number of digits in an effort to avoid floating point error
+    """Evaluates an expression containing 2 numbers and a binary operator
+    returns a numerical value with the appropriate precision.
     """
 
     if bin_op == '/':
@@ -114,46 +115,21 @@ def evaluate_terms(terms):
     while expr_terms.count('^') != 0:
         expr_terms = eval_expon(expr_terms)
 
-    while expr_terms.count('*') + expr_terms.count('/') != 0:
+    while mul_div_re.search(str(expr_terms)) is not None:
         expr_terms = eval_a_op_b(expr_terms, 'md')
 
-    while expr_terms.count('+') + expr_terms.count('-') != 0:
+    while add_sub_re.search(str(expr_terms)) is not None:
         expr_terms = eval_a_op_b(expr_terms, 'pm')
 
     return expr_terms[0]
 
 
-def eval_ready(array):
-    string = str(array)
-    return 'FUNC' not in string and 'PAREN' not in string
-
-
-# EXP1 = '5+sin(4*6(3-5))'
-
-# print(bin_op_re.search(EXP1))
-
-print(eval_a_op_b([1, '*', 3], 'md'))
-
-# if __name__ == '__main__':
-#     EXP1 = '5+sin(4*6(3-5))'
-#     disp_ans(EXP1)
-
-#     EXP2 = '5+sin(-4)'
-#     disp_ans(EXP2)
-
-#     EXP3 = '4*6(3-5)'
-#     disp_ans(EXP3)
-
-#     EXP4 = '8 - 2(2)(3)'
-#     disp_ans(EXP4)
-
-#     EXP5 = '8 - 2*2*3'
-#     disp_ans(EXP5)
-
-#     EXPW = '7 + 3 + 1 + 3 + 5 + 3 + 1 +3 '
-    # disp_ans(EXPW)
-    # neg_base = '-3^0.5'
-    # disp_ans(neg_base)
-
-    # neg_base2 = '8-3^2'
-    # disp_ans(neg_base2)
+if __name__ == '__main__':
+    print(eval_a_op_b([1, '*', 3], 'md')[0])
+    num_test = 0.357
+    print(type(num_test))
+    print(frac.Fraction(str(num_test)))
+    print(frac.Fraction(str(0.357)))
+    print(frac.Fraction(0.357))
+    print(frac.Fraction.from_float(0.357))
+    print(frac.Fraction(357, 1000))
