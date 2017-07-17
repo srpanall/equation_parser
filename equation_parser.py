@@ -306,7 +306,7 @@ def eval_a_op_b(terms, op_1, op_2):
 
     return terms
 
-# Rewrite using a regex
+
 def first_index(terms, op_1, op_2):
     '''determines'''
     if terms.count(op_1) != 0:
@@ -350,9 +350,11 @@ def evaluate_terms(terms):
     return expr_terms[0]
 
 
-def eval_ready(array):
-    string = str(array)
-    return 'FUNC' not in string and 'PAREN' not in string
+fp_reg = re.compile(r'FUNC|PAREN')
+
+# def eval_ready(array):
+#     string = fp_reg.search(str(array)) is None
+#     return 'FUNC' not in string and 'PAREN' not in string
 
 
 ##############################################
@@ -374,7 +376,7 @@ def atomizer(chunks):
         else:
             terms += [item[1]]
 
-    while not eval_ready(terms):
+    while fp_reg.search(str(terms)) is not None:
         terms = atomizer(terms)
 
     answer = evaluate_terms(terms)
@@ -409,13 +411,15 @@ if __name__ == '__main__':
 
     EXP3 = '4*6(3-5)'
     disp_ans(EXP3)
-    
+
     EXP4 = '8 - 2(2)(3)'
     disp_ans(EXP4)
 
     EXP5 = '8 - 2*2*3'
     disp_ans(EXP5)
-    
+
+    EXPW = '7 + 3 + 1 + 3 + 5 + 3 + 1 +3 '
+    disp_ans(EXPW)
     # neg_base = '-3^0.5'
     # disp_ans(neg_base)
 
