@@ -124,6 +124,7 @@ func_mapper = {"ABS": func_abs, "CEIL": func_ceil, "FLOOR": func_floor,
                "LOG": func_log, "LOGX": func_logx
                }
 
+func_mult_arg = ["MIN", "MAX", "MOD", "RTX", "ROUND", "LOGX", "TRUNC"]
 
 sorted_func = sorted(func_text, key=len, reverse=True)
 
