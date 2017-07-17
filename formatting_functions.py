@@ -5,18 +5,48 @@ import re
 paren_re = re.compile(r'\([^\(\)]+\)')
 comma_re = re.compile(r'(\d)\,(\d\d\d)')
 mult_re = re.compile(r'(\d)(\()|(\d)([a-zA-Z])')
-# func_arg_re = re.compile(r'([a-zA-Z]+\(\d+,\d+\))')
+
+multiple_i = r'([+-])?(\d+\.\d*|\d+)?(i+|j+)(\d+\.\d*|\d+)?'
+multi_i_re = re.compile(multiple_i, flags=re.I)
+
+comp_forms = [r'\d[ij]', r'[ij]\d', r'ii+', r'jj+', r'([^a-zA-z][ij])',
+              r'([ij][^a-zA-z])', r'([^a-zA-z][ij][^a-zA-z])'
+              ]
+comp_forms_reg = '|'.join(comp_forms)
+comp_test_re = re.compile(comp_forms_reg, flags=re.I)
+
+
+def update_complex(expr):
+    upd_expr = multi_i_re.subn(fix_im, expr)
+
+    return upd_expr[0]
+
+
+def fix_im(matchobj):
+    '''takes the imaginary term found in the expression and converts it to
+    the form bi'''
+    txt = [item for item in matchobj.groups()]
+    n_j = txt[2].count(txt[2][0])
+    factors = [float(x) if x is not None else 1 for x in [txt[1], txt[3]]]
+
+    if txt[0] == '-':
+        sign = -1
+    else:
+        sign = 1
+
+    com_num = sign * factors[0] * factors[1] * 1j ** n_j
+    im_coeff = com_num.imag
+
+    return '+(' + str(im_coeff) + 'j)'
 
 
 def find_all_parens(expression):
     """Locates all pairs of parentheses in an expression and returns
     a dictionary with entries lp_pos: rp_pos.
     """
-
     paren_info = [[paren_obj.group(), paren_obj.start(), paren_obj.end()]
                   for paren_obj in paren_re.finditer(expression)]
     paren_loc = [[span[1], span[2]] for span in paren_info]
-
     expr_list = list(expression)
 
     for p_start, p_end in paren_loc:
@@ -92,16 +122,16 @@ def remove_comma_format(expr):
 def make_mult_explicit(expr):
     """Replaces implicit multiplication with * and returns a string."""
     if expr[0] == '-' and not expr[1].isdigit():
-        exp_1 = '(-1)*' + expr[1:]
+        exp_out = '(-1)*' + expr[1:]
     else:
-        exp_1 = expr
+        exp_out = expr
 
-    exp_2 = mult_re.subn(r'\1*\2', exp_1)[0]
+    exp_out = mult_re.subn(r'\1*\2', exp_out)[0]
 
-    if exp_2.count(')(') != 0:
-        exp_2 = re.subn(r'(\))(\()', ')*(', exp_2)[0]
+    if exp_out.count(')(') != 0:
+        exp_out = re.subn(r'(\))(\()', ')*(', exp_out)[0]
 
-    return exp_2
+    return exp_out
 
 
 def initial_prep(expr):

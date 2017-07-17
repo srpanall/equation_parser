@@ -23,16 +23,23 @@ comp_forms = [r'\d[ij]', r'[ij]\d', r'ii+', r'jj+', r'([^a-zA-z][ij])',
               ]
 comp_forms_reg = '|'.join(comp_forms)
 comp_test_re = re.compile(comp_forms_reg, flags=re.I)
+multi_i_re = re.compile(multiple_i, flags=re.I)
 
+# def expr_update_complex(expr):
+#     upd_expr = expr.replace(" ", "")
+
+#     if comp_test_re.search(upd_expr) is None:
+#         return expr
+#     else:
+#         upd_expr = multi_i_reg.sub(fix_im, upd_expr)
+#         return upd_expr
 
 def expr_update_complex(expr):
-    upd_expr = expr.replace(" ", "")
+    upd_expr = multi_i_re.subn(fix_im, expr)
 
-    if comp_test_re.search(upd_expr) is None:
-        return '%s contains no complex numbers' % expr
-    else:
-        upd_expr = multi_i_reg.sub(fix_im, upd_expr)
-        return upd_expr
+    print(upd_expr[0])
+
+    return upd_expr[0]
 
 
 def fix_im(matchobj):
@@ -53,10 +60,12 @@ def fix_im(matchobj):
 
     im_coeff = com_num.imag
 
-    if im_coeff > 0:
-        return '+' + str(im_coeff) + 'j'
-    else:
-        return str(im_coeff) + 'j'
+    return '+(' + str(im_coeff) + 'j)'
+
+    # if im_coeff > 0:
+    #     return '+(' + str(im_coeff) + 'j)'
+    # else:
+    #     return str(im_coeff) + 'j'
 
 
 for c_s in complex_string2:
