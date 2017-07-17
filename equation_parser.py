@@ -350,9 +350,11 @@ def evaluate_terms(terms):
     return expr_terms[0]
 
 
-def eval_ready(array):
-    string = str(array)
-    return 'FUNC' not in string and 'PAREN' not in string
+fp_reg = re.compile(r'FUNC|PAREN')
+
+# def eval_ready(array):
+#     string = fp_reg.search(str(array)) is None
+#     return 'FUNC' not in string and 'PAREN' not in string
 
 
 ##############################################
@@ -374,7 +376,7 @@ def atomizer(chunks):
         else:
             terms += [item[1]]
 
-    while not eval_ready(terms):
+    while fp_reg.search(str(terms)) is not None:
         terms = atomizer(terms)
 
     answer = evaluate_terms(terms)

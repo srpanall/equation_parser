@@ -1,11 +1,7 @@
 
 import re
-# import os
-# from pprint import pprint
 import operator
 import fractions as frac
-import numpy as np
-from parser_functions import *
 
 # ### Evaluation functions
 
