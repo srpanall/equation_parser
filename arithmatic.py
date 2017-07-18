@@ -22,7 +22,6 @@ def eval_bin_expr(num_1, num_2, bin_op):
     """Evaluates an expression containing 2 numbers and a binary operator
     returns a numerical value with the appropriate precision.
     """
-
     if bin_op == '/':
         if isinstance(num_1, int) and isinstance(num_2, int):
             return frac.Fraction(num_1, num_2)
@@ -77,19 +76,6 @@ def eval_a_op_b(terms, op):
     return terms
 
 
-def first_index(terms, op_1, op_2):
-    '''determines'''
-    if terms.count(op_1) != 0:
-        i_1 = terms.index(op_1)
-    else:
-        return terms.index(op_2)
-
-    if terms.count(op_2) == 0:
-        return i_1
-    else:
-        return min(i_1, terms.index(op_2))
-
-
 def eval_expon(terms):
     # print(terms)
     expr_terms = [x for x in terms]
@@ -126,10 +112,4 @@ def evaluate_terms(terms):
 
 if __name__ == '__main__':
     print(eval_a_op_b([1, '*', 3], 'md')[0])
-    num_test = 0.357
-    print(type(num_test))
-    print(frac.Fraction(str(num_test)))
-    print(frac.Fraction(str(0.357)))
-    print(frac.Fraction(0.357))
-    print(frac.Fraction.from_float(0.357))
-    print(frac.Fraction(357, 1000))
+    print(evaluate_terms([2, '^', 4]))

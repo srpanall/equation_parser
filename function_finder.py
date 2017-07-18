@@ -108,8 +108,10 @@ def funcs_using(func_dict):
 
     dep_func = sorted(list(set_depend))
 
-    dep_out = {func : [caller for caller in func_w_dep if func in func_dict[caller]] for func in dep_func}
+    dep_out = {func: [caller for caller in func_w_dep if
+               func in func_dict[caller]] for func in dep_func}
 
     return dep_out
+
 
 pprint(funcs_using(all_depend(files[3])))
