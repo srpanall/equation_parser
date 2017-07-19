@@ -6,106 +6,12 @@ import operator
 import fractions as frac
 import numpy as np
 from parser_functions import *
-
-# ### Preparing the Expression
-
-
-def find_all_parens(expression):
-    '''returns a list containing the location of each set of parentheses
-    as [lp_pos,rp_pos]'''
-
-    paren_info = [[x.group(), x.start(), x.end()]
-                  for x in re.finditer(r'\([^\(\)]+\)', expression)]
-    exprs = [x[0] for x in paren_info]
-    paren_loc = [[x[1], x[2]] for x in paren_info]
-
-    for item in exprs:
-        expression = expression.replace(item, '_' + item[1:-1] + '_')
-
-    if expression.count('(') != 0:
-        paren_loc += [[x, y] for x, y in find_all_parens(expression).items()]
-
-    return {x: y for x, y in paren_loc}
-
-
-def remove_double_parens(expr):
-    '''returns the expression after eliminating any double sets of
-    parentheses if necessary. e.g. 3((x+y)) beomces 3(x+y)'''
-
-    paren_loc = find_all_parens(expr)
-    paren_doub = {x: y - 1 for x, y in paren_loc.items()
-                  if paren_loc.get(x - 1, 0) == y + 1}
-    doub_loc = list(paren_doub.keys()) + list(paren_doub.values())
-
-    return ''.join([y for x, y in enumerate(expr) if x not in doub_loc])
-
-
-def remove_doub_ops(expr):
-    '''Returns the expression after replacing an operator followed by a negative
-    sign with a mathematically equivalent operation'''
-    ud_expr = expr
-    double_ops = [('+-', '-'), ('--', '+'), ('*-', '*(-1)*'), ('/-', '*(-1)/')]
-
-    for old_op, new_op in double_ops:
-        while ud_expr.count(old_op) > 0:
-            ud_expr = ud_expr.replace(old_op, new_op)
-
-    return ud_expr
-
-
-def remove_comma_format(expr):
-    '''removes commas from all numbers to eliminate potential conversion
-    errors from string to number'''
-    if expr.count(',') == 0:
-        return expr
-
-    exp_1 = expr
-    exp_2 = comma_re.sub(r'\1\2', expr)
-
-    while exp_1 != exp_2:
-        exp_1 = exp_2
-        exp_2 = comma_re.sub(r'\1\2', exp_1)
-
-    return exp_2
-
-
-def make_mult_explicit(expr):
-    '''returns an expression where any sort of implicit multiplication is
-    expressed as a binary operation E.g. 5(9) -> 5*9.'''
-    if expr[0] == '-' and not expr[1].isdigit():
-        exp_1 = '(-1)*' + expr[1:]
-    else:
-        exp_1 = expr
-
-    exp_2 = mult_re.subn(r'\1*\2', exp_1)[0]
-
-    if exp_2.count(')(') != 0:
-        exp_2 = re.subn(r'(\))(\()', ')*(', exp_2)[0]
-
-    # while exp_1 != exp_2:
-    #     exp_1 = exp_2
-    #     exp_2 = comma_re.sub(r'\1*\2', exp_1)
-
-    return exp_2
-
-
-def initial_prep(expr):
-    '''formats expression to eliminate ambiguity and make chunking easier'''
-    expr_out = expr.replace(' ', '')
-    expr_out = expr_out.upper()
-    expr_out = remove_doub_ops(expr_out)
-    expr_out = remove_comma_format(expr_out)
-    expr_out = remove_double_parens(expr_out)
-    expr_out = make_mult_explicit(expr_out)
-
-    # print(expr_out)
-
-    return expr_out
+from formatting_functions import initial_prep, find_all_parens
 
 
 def id_paren(expr):
-    '''returns the expression after replacing all parentheses and their
-    content with underscores'''
+    """returns the expression after replacing all parentheses and their
+    content with underscores"""
     expr_out = expr
 
     if expr_out.count('((') * expr_out.count('))') != 0:
@@ -124,8 +30,8 @@ def id_paren(expr):
 
 
 def id_funct(expr):
-    '''returns the expression after replacing all functions and their
-    arguments with ` '''
+    """returns the expression after replacing all functions and their
+    arguments with ` """
     expr_out = expr
 
     for item in sorted_func:
@@ -140,8 +46,8 @@ def id_funct(expr):
 
 
 def token_prep(expr):
-    '''prepares for Tokenizer by replacing contents of parentheses/functions
-    with symbols'''
+    """prepares for Tokenizer by replacing contents of parentheses/functions
+    with symbols"""
     expr_out = id_paren(expr)
     expr_out = id_funct(expr_out)
 
@@ -152,12 +58,12 @@ def token_prep(expr):
 
 
 def op_chunk(*tupe):
-    '''Returns the binary operator in the chunk'''
+    """Returns the binary operator in the chunk"""
     return tupe[1][1]
 
 
 def num_chunk(*tupe):
-    '''converts number from string to numerical value'''
+    """converts number from string to numerical value"""
     num = tupe[1][1]
     if num.count('.') == 1:
         return float(num)
@@ -165,7 +71,7 @@ def num_chunk(*tupe):
 
 
 def func_chunk(expr, tupe):
-    '''Returns a list of the form [mathematical function, argument]'''
+    """Returns a list of the form [mathematical function, argument]"""
     func_in = expr[tupe[2]:tupe[3]]
 
     func = re.match(r'[A-Za-z]+\(', func_in).group()
@@ -176,12 +82,12 @@ def func_chunk(expr, tupe):
 
 
 def paren_chunk(expr, tupe):
-    '''Recursively chunks the contents of the parentheses in the expression'''
+    """Recursively chunks the contents of the parentheses in the expression"""
     return chunk_expr(expr[tupe[2] + 1:tupe[3] - 1])
 
 
 def other_chunk(*tupe):
-    '''Returns any unknown word, serves to identify unknown functions'''
+    """Returns any unknown word, serves to identify unknown functions"""
     return tupe[1][1]
 
 
@@ -190,7 +96,7 @@ def other_chunk(*tupe):
 
 
 def pi_chunk(*tupe):
-    '''Returns pi if present'''
+    """Returns pi if present"""
     return np.pi
 
 # dictionary mapping chunk type to appropriate function
@@ -211,9 +117,9 @@ DCHUNK = {
 
 
 def tokenize(code):
-    '''Returns a list of named tuples containing the type of chunk, its
+    """Returns a list of named tuples containing the type of chunk, its
     content, as well as the start and end point in the function and it's
-    position in the string'''
+    position in the string"""
     dict_kinds = {'FUNC': '`', 'PARENS': '(_)'}
 
     for mobj in token_re.finditer(code):
@@ -231,8 +137,8 @@ def tokenize(code):
 
 
 def chunk_expr(expr):
-    '''Parses the expression and returns a list of numbers, binary operators,
-    '''
+    """Parses the expression and returns a list of numbers, binary operators,
+    """
     mod_expr = token_prep(expr)
 
     tokens = [token for token in tokenize(mod_expr)]
@@ -246,7 +152,7 @@ def chunk_expr(expr):
 
 
 def decimal_place_counter(number):
-    '''Returns the number of digits to the right of the decimal point'''
+    """Returns the number of digits to the right of the decimal point"""
     num_str = str(number)
     if num_str.count('.') == 0:
         return 0
@@ -255,8 +161,8 @@ def decimal_place_counter(number):
 
 
 def eval_bin_expr(num_1, num_2, bin_op):
-    '''returns c with the appropriate number of digits in an effort to avoid
-    floating point error'''
+    """returns c with the appropriate number of digits in an effort to avoid
+    floating point error"""
 
     if bin_op == '/':
         if isinstance(num_1, int) and isinstance(num_2, int):
@@ -294,8 +200,8 @@ BIN_OP_DICT = {
 
 
 def eval_a_op_b(terms, op_1, op_2):
-    '''performs the first calculation according to the order
-    of operations in the terms'''
+    """performs the first calculation according to the order
+    of operations in the terms"""
     index_1 = first_index(terms, op_1, op_2)
     num_1, num_2 = terms[index_1 - 1], terms[index_1 + 1]
     bin_op = terms[index_1]
@@ -306,9 +212,10 @@ def eval_a_op_b(terms, op_1, op_2):
 
     return terms
 
+
 # Rewrite using a regex
 def first_index(terms, op_1, op_2):
-    '''determines'''
+    """determines"""
     if terms.count(op_1) != 0:
         i_1 = terms.index(op_1)
     else:
@@ -400,6 +307,19 @@ def disp_ans(expr):
     print(expr, '=', evaluate(expr))
 
 
+# def tracefunc(frame, event, arg, indent=[0]):
+#     if event == "call":
+#         indent[0] += 2
+#         print("-" * indent[0] + "> call function", frame.f_code.co_name)
+#     elif event == "return":
+#         print("<" + "-" * indent[0], "exit function", frame.f_code.co_name)
+#         indent[0] -= 2
+#     return tracefunc
+
+
+# import sys
+# sys.settrace(tracefunc)
+
 if __name__ == '__main__':
     EXP1 = '5+sin(4*6(3-5))'
     disp_ans(EXP1)
@@ -409,13 +329,13 @@ if __name__ == '__main__':
 
     EXP3 = '4*6(3-5)'
     disp_ans(EXP3)
-    
+
     EXP4 = '8 - 2(2)(3)'
     disp_ans(EXP4)
 
     EXP5 = '8 - 2*2*3'
     disp_ans(EXP5)
-    
+
     # neg_base = '-3^0.5'
     # disp_ans(neg_base)
 
