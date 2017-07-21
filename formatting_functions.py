@@ -123,24 +123,25 @@ COMP_STR = ['16+1.7320508075688772j', '16 + 1.7320508075688772 j',
             '7-12i', '14+2i', 'win', '(7-12i)*(14+2i)', '3iii']
 
 
-if __name__ == '__main__':
-    EXP1 = '5+sin(4*6(3-5))'
-    EXP2 = '5i+sin(4*6(3j-5))'
-    EXP3 = '5+sin(4*6(3j-5))'
-    EXP4 = '8 - 2(2)(3)'
-    EXP5 = '5i + int(4*6(3j-5))'
 
-    print(EXP1)
-    print(initial_prep(EXP1))
-    print()
-    print(EXP2)
-    print(initial_prep(EXP2))
-    print()
-    print(EXP3)
-    print(initial_prep(EXP3))
-    print()
-    print(EXP5)
-    print(initial_prep(EXP5))
-    for expr in COMP_STR:
-        print(expr)
-        print(initial_prep(expr))
+# if __name__ == '__main__':
+#     EXP1 = '5+sin(4*6(3-5))'
+#     EXP2 = '5i+sin(4*6(3j-5))'
+#     EXP3 = '5+sin(4*6(3j-5))'
+#     EXP4 = '8 - 2(2)(3)'
+#     EXP5 = '5i + int(4*6(3j-5))'
+
+#     print(EXP1)
+#     print(initial_prep(EXP1))
+#     print()
+#     print(EXP2)
+#     print(initial_prep(EXP2))
+#     print()
+#     print(EXP3)
+#     print(initial_prep(EXP3))
+#     print()
+#     print(EXP5)
+#     print(initial_prep(EXP5))
+#     for expr in COMP_STR:
+#         print(expr)
+#         print(initial_prep(expr))

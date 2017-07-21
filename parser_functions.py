@@ -113,7 +113,7 @@ func_text = ["ABS", "CEIL", "FLOOR", "MIN", "MAX", "MOD", "RTX", "ROUND",
 # Functions I may need to make nCr, nPr, n!
 # combinations, permutations, factorial
 
-func_mapper = {x: 'func_' + x.lower() for x in func_text}
+# func_mapper = {x: 'func_' + x.lower() for x in func_text}
 
 func_mapper = {"ABS": func_abs, "CEIL": func_ceil, "FLOOR": func_floor,
                "MIN": func_min, "MAX": func_max, "MOD": func_mod,

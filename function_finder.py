@@ -114,4 +114,5 @@ def funcs_using(func_dict):
     return dep_out
 
 
+print(files[3])
 pprint(funcs_using(all_depend(files[3])))

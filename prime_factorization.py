@@ -40,7 +40,7 @@ def prod_fact(d_factored):
     for item in d_factored.items():
         p, a = item
         val_out = val_out * p ** a
-    print(val_out)
+    # print(val_out)
     return val_out
 
 
@@ -58,7 +58,7 @@ def factor_n(n):
             out[p] = a
         if p > new_n:
             break
-    print(prod_fact(out))
+    # print(prod_fact(out))
     test = prod_fact(out) != n
     while test:
         primes.append(next(n_p))
@@ -74,11 +74,13 @@ def factor_n(n):
 
 
 if __name__ == '__main__':
-    print(factor_n(83))
+    print(987)
+    print(factor_n(987))
     # print(primes)
-    print(factor_n(87))
+    print(123)
+    print(factor_n(123))
     # print(primes)
-    print(factor_n(89))
+    # print(factor_n(89))
     # print(primes)
     # print(factor_n(9863))
     # print(primes)
