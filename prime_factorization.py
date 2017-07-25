@@ -1,3 +1,5 @@
+import time
+
 primes = [2, 3]
 
 
@@ -73,12 +75,37 @@ def factor_n(n):
     return out
 
 
-if __name__ == '__main__':
-    print(987)
-    print(factor_n(987))
-    # print(primes)
-    print(123)
-    print(factor_n(123))
+def prime_test_v0(n):
+    if n == 1 or n % 2 == 0:
+        return False
+    for d in range(3, int(n ** 0.5), 2):
+        if n % d == 0:
+            return False
+    return True
+
+
+t0 = time.time()
+for n in range(2, 10**6):
+    prime_test_v0(n)
+    # print(primes[-1])
+t1 = time.time()
+print("Time required: ", t1 - t0)
+
+t2 = time.time()
+for n in range(2, 10**6):
+    prime_test(n)
+    # print(primes[-1])
+t3 = time.time()
+print("Time required: ", t3 - t2)
+
+
+# if __name__ == '__main__':
+#   t0 = time,time()
+#     print(987)
+#     print(factor_n(987))
+#     # print(primes)
+#     print(123)
+#     print(factor_n(123))
     # print(primes)
     # print(factor_n(89))
     # print(primes)
