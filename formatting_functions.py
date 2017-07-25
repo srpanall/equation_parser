@@ -37,7 +37,7 @@ def fix_im(matchobj):
     com_num = sign * factors[0] * factors[1] * 1j ** n_j
     im_coeff = com_num.imag
 
-    exp_out = '(' + str(im_coeff) + '*j)'
+    exp_out = '(' + str(im_coeff) + '*(j))'
     if im_coeff < 0 or txt[0] is not None:
         exp_out = '+' + exp_out
 
@@ -119,8 +119,8 @@ def initial_prep(expr_in):
     return expr_out
 
 
-COMP_STR = ['16+1.7320508075688772j', '16 + 1.7320508075688772 j',
-            '7-12i', '14+2i', 'win', '(7-12i)*(14+2i)', '3iii']
+# COMP_STR = ['16+1.7320508075688772j', '16 + 1.7320508075688772 j',
+#             '7-12i', '14+2i', 'win', '(7-12i)*(14+2i)', '3iii']
 
 
 
@@ -142,6 +142,6 @@ COMP_STR = ['16+1.7320508075688772j', '16 + 1.7320508075688772 j',
 #     print()
 #     print(EXP5)
 #     print(initial_prep(EXP5))
-#     for expr in COMP_STR:
-#         print(expr)
-#         print(initial_prep(expr))
+    # for expr in COMP_STR:
+    #     print(expr)
+    #     print(initial_prep(expr))

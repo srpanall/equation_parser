@@ -10,7 +10,6 @@ from parser_functions import *
 from formatting_functions import find_all_parens
 
 
-
 Token = collections.namedtuple('Token', ['typ', 'value', 'start', 'stop'])
 
 token_specification = [
@@ -26,8 +25,6 @@ token_specification = [
 
 tok_reg = '|'.join('(?P<%s>%s)' % pair for pair in token_specification)
 token_re = re.compile(tok_reg)
-
-
 
 
 
@@ -222,6 +219,24 @@ def disp_ans(expr):
     print(expr, '=', evaluate(expr))
 
 
+comma_reg = re.compile(r'(\d{1,3}(?:\,\d\d\d)+)')
+
+
+def comma_fix(matchobj):
+    old = matchobj.group()
+    num_comma = old.count(',')
+    new = '0' * num_comma + old.replace(',', '')
+    return new
+
+
+num = '-1,234,567'
+
+temp = comma_reg.sub(comma_fix, num)
+
+print(int(temp) == -1234567)
+
+
+
 # def tracefunc(frame, event, arg, indent=[0]):
 #     if event == "call":
 #         indent[0] += 2
@@ -235,21 +250,21 @@ def disp_ans(expr):
 # import sys
 # sys.settrace(tracefunc)
 
-if __name__ == '__main__':
-    EXP1 = '5+sin(4*6(3-5))'
-    disp_ans(EXP1)
+# if __name__ == '__main__':
+#     EXP1 = '5+sin(4*6(3-5))'
+#     disp_ans(EXP1)
 
-    EXP2 = '5+sin(-4)'
-    disp_ans(EXP2)
+#     EXP2 = '5+sin(-4)'
+#     disp_ans(EXP2)
 
-    EXP3 = '4*6(3-5)'
-    disp_ans(EXP3)
+#     EXP3 = '4*6(3-5)'
+#     disp_ans(EXP3)
 
-    EXP4 = '8 - 2(2)(3)'
-    disp_ans(EXP4)
+#     EXP4 = '8 - 2(2)(3)'
+#     disp_ans(EXP4)
 
-    EXP5 = '8 - 2*2*3'
-    disp_ans(EXP5)
+#     EXP5 = '8 - 2*2*3'
+#     disp_ans(EXP5)
 
     # neg_base = '-3^0.5'
     # disp_ans(neg_base)

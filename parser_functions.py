@@ -131,15 +131,16 @@ sorted_func = sorted(func_text, key=len, reverse=True)
 Token = collections.namedtuple('Token', ['typ', 'value', 'start', 'stop'])
 
 token_specification = [
-    ('NEGNUM', r'^(\-\d+\.?\d*)'),  # Negative integer or decimal number
-    ('NUMBER', r'\d+\.?\d*'),       # Integer or decimal number
-    ('PI', r'PI'),                  # PI
-    ('FUNC', r'`+'),                # Functions
-    ('OP', r'[+\-*/\^]'),           # Arithmetic operators
-    ('PARENS', r'\(_+\)'),          # Parenthetical terms
-    ('OTHER', r'[A-Za-z]+'),        # Any other words
+    ('NEGNUM', r'^(\-\d+\.?\d*)'),   # Negative integer or decimal number
+    ('COMPNUM', r'^([jJ])'),         # i or j
+    ('NUMBER', r'\d+\.?\d*'),        # Integer or decimal number
+    ('PI', r'PI'),                   # PI
+    ('FUNC', r'`+'),                 # Functions
+    ('OP', r'[+\-*/\^]'),            # Arithmetic operators
+    ('PARENS', r'\(_+\)'),           # Parenthetical terms
+    ('OTHER', r'[A-Za-ik-z]+'),         # Any other words
     # ('LRP', r'[\(\)]'),             # Any parentheses
-    ('MISMATCH', r'.'),             # Any other character
+    ('MISMATCH', r'.'),              # Any other character
 ]
 
 comma_re = re.compile(r'(\d)\,(\d\d\d)')

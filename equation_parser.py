@@ -2,11 +2,12 @@
 import re
 # import os
 # from pprint import pprint
-import operator
+# import operator
 import fractions as frac
 import numpy as np
 from parser_functions import *
 from formatting_functions import initial_prep, find_all_parens
+from arithmatic import evaluate_terms
 
 
 def id_paren(expr):
@@ -65,9 +66,7 @@ def op_chunk(*tupe):
 def num_chunk(*tupe):
     """converts number from string to numerical value"""
     num = tupe[1][1]
-    if num.count('.') == 1:
-        return float(num)
-    return int(num)
+    return frac.Fraction(num)
 
 
 def func_chunk(expr, tupe):
@@ -83,7 +82,18 @@ def func_chunk(expr, tupe):
 
 def paren_chunk(expr, tupe):
     """Recursively chunks the contents of the parentheses in the expression"""
-    return chunk_expr(expr[tupe[2] + 1:tupe[3] - 1])
+    expr_in = expr[tupe[2] + 1:tupe[3] - 1]
+
+    if expr_in == 'j':
+        return [1j]
+
+    #     try:
+    #         expr_in = expr_in.replace('J', 'j')
+    #         return [complex(expr_in)]
+    #     except:
+    #         pass
+
+    return chunk_expr(expr_in)
 
 
 def other_chunk(*tupe):
@@ -95,6 +105,11 @@ def other_chunk(*tupe):
 #     return tupe[1][1]
 
 
+def comp_chunk(*tupe):
+    """Returns pi if present"""
+    return 0 + 1j
+
+
 def pi_chunk(*tupe):
     """Returns pi if present"""
     return np.pi
@@ -104,6 +119,7 @@ def pi_chunk(*tupe):
 
 DCHUNK = {
     'NEGNUM': num_chunk,
+    'COMPNUM': comp_chunk,
     'NUMBER': num_chunk,
     'FUNC': func_chunk,
     'OP': op_chunk,
@@ -150,111 +166,8 @@ def chunk_expr(expr):
 
 # ### Evaluation functions
 
+# Moved to arithmetic.py
 
-def decimal_place_counter(number):
-    """Returns the number of digits to the right of the decimal point"""
-    num_str = str(number)
-    if num_str.count('.') == 0:
-        return 0
-    else:
-        return len(num_str) - 1 - num_str.index('.')
-
-
-def eval_bin_expr(num_1, num_2, bin_op):
-    """returns c with the appropriate number of digits in an effort to avoid
-    floating point error"""
-
-    if bin_op == '/':
-        if isinstance(num_1, int) and isinstance(num_2, int):
-            return frac.Fraction(num_1, num_2)
-        return num_1 / num_2
-
-    num_3 = BIN_OP_DICT[bin_op](num_1, num_2)
-
-    num_1_places = decimal_place_counter(num_1)
-    num_2_places = decimal_place_counter(num_2)
-    num_3_places = decimal_place_counter(num_3)
-
-    if bin_op == '*':
-        r_places = num_1_places * num_2_places
-    else:
-        r_places = max(num_1_places, num_2_places)
-
-    if num_3_places <= r_places:
-        return num_3
-    else:
-        str_num_3 = str(num_3)
-        new_num_3 = str_num_3[:len(str_num_3) - r_places]
-
-    if new_num_3.count('.') == 1:
-        return float(new_num_3)
-    else:
-        return int(new_num_3)
-
-
-BIN_OP_DICT = {
-    '+': operator.add,
-    '-': operator.sub,
-    '*': operator.mul,
-}
-
-
-def eval_a_op_b(terms, op_1, op_2):
-    """performs the first calculation according to the order
-    of operations in the terms"""
-    index_1 = first_index(terms, op_1, op_2)
-    num_1, num_2 = terms[index_1 - 1], terms[index_1 + 1]
-    bin_op = terms[index_1]
-
-    terms[index_1 - 1] = eval_bin_expr(num_1, num_2, bin_op)
-
-    del terms[index_1: index_1 + 2]
-
-    return terms
-
-
-# Rewrite using a regex
-def first_index(terms, op_1, op_2):
-    """determines"""
-    if terms.count(op_1) != 0:
-        i_1 = terms.index(op_1)
-    else:
-        return terms.index(op_2)
-
-    if terms.count(op_2) == 0:
-        return i_1
-    else:
-        return min(i_1, terms.index(op_2))
-
-
-def eval_expon(terms):
-    # print(terms)
-    expr_terms = [x for x in terms]
-    i = expr_terms.index('^')
-    if expr_terms[i + 1] == '-':
-        expr_terms[i + 1] = -1 * expr_terms[i + 2]
-        del expr_terms[i + 2]
-
-    expr_terms[i - 1] = expr_terms[i - 1] ** expr_terms[i + 1]
-
-    del expr_terms[i: i + 2]
-
-    return expr_terms
-
-
-def evaluate_terms(terms):
-    expr_terms = [x for x in terms]
-
-    while expr_terms.count('^') != 0:
-        expr_terms = eval_expon(expr_terms)
-
-    while expr_terms.count('*') + expr_terms.count('/') != 0:
-        expr_terms = eval_a_op_b(expr_terms, '*', '/')
-
-    while expr_terms.count('+') + expr_terms.count('-') != 0:
-        expr_terms = eval_a_op_b(expr_terms, '+', '-')
-
-    return expr_terms[0]
 
 
 def eval_ready(array):
@@ -270,9 +183,12 @@ def atomizer(chunks):
     terms = []
     # print(chunks)
     for item in chunks:
-        # print(item)
+        # print(item, type(item))
         if item[0] == 'PARENS':
-            terms += [atomizer(item[1])]
+            if len(item[1]) == 1 and type(item[1][0]) is not list:
+                terms += item[1]
+            else:
+                terms += [atomizer(item[1])]
         elif item[0] == 'FUNC':
             f_term = atomizer(item[1][1])
             # print(['item', type(item), item])
@@ -336,8 +252,11 @@ if __name__ == '__main__':
     EXP5 = '8 - 2*2*3'
     disp_ans(EXP5)
 
-    # neg_base = '-3^0.5'
-    # disp_ans(neg_base)
+    EXP6 = '(5+3j)(5-2j)'
+    disp_ans(EXP6)
 
-    # neg_base2 = '8-3^2'
-    # disp_ans(neg_base2)
+    neg_base = '-3^0.5'
+    disp_ans(neg_base)
+
+    neg_base2 = '8-3^2'
+    disp_ans(neg_base2)
