@@ -2,6 +2,8 @@
 
 import re
 
+# Regular expressions used in module
+
 PAREN_RE = re.compile(r'\([^\(\)]+\)')
 
 MULT_RE = re.compile(r'(\d)(\()|(\d)([a-zA-Z])')
@@ -22,8 +24,8 @@ def update_complex(expr_in):
 
 
 def fix_im(matchobj):
-    """Takes an imaginary term found in the expression and returns the
-    the string '+(bJ)'.
+    """Takes an imaginary term found in the expression and returns a
+    string either '(b*(j))' or '(b*(j))'.
     """
     txt = [item for item in matchobj.groups()]
     n_j = txt[2].count(txt[2][0])
@@ -117,31 +119,3 @@ def initial_prep(expr_in):
     expr_out = make_mult_explicit(expr_out)
 
     return expr_out
-
-
-# COMP_STR = ['16+1.7320508075688772j', '16 + 1.7320508075688772 j',
-#             '7-12i', '14+2i', 'win', '(7-12i)*(14+2i)', '3iii']
-
-
-
-# if __name__ == '__main__':
-#     EXP1 = '5+sin(4*6(3-5))'
-#     EXP2 = '5i+sin(4*6(3j-5))'
-#     EXP3 = '5+sin(4*6(3j-5))'
-#     EXP4 = '8 - 2(2)(3)'
-#     EXP5 = '5i + int(4*6(3j-5))'
-
-#     print(EXP1)
-#     print(initial_prep(EXP1))
-#     print()
-#     print(EXP2)
-#     print(initial_prep(EXP2))
-#     print()
-#     print(EXP3)
-#     print(initial_prep(EXP3))
-#     print()
-#     print(EXP5)
-#     print(initial_prep(EXP5))
-    # for expr in COMP_STR:
-    #     print(expr)
-    #     print(initial_prep(expr))
