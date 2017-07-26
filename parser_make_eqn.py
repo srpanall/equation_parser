@@ -63,6 +63,8 @@ eval_expr = []
 
 num_eqn = 50
 
+num_errors = 0
+
 for n in range(num_eqn):
     n1 = random.randint(1, 100)
     # n1 = n1 * random.choice([-1, 1])
@@ -89,11 +91,13 @@ for n in range(num_eqn):
         if abs(lhs_val - rhs) < 10 ** -10:
             eval_expr += [[lhs, lhs_val, rhs]]
     except TypeError:
+        num_errors += 1
         print()
         print('ERROR', lhs)
         print()
 
     print(lhs, ' = ', rhs)
 
+print(num_errors)
 # pprint(equations)
 # pprint(eval_expr)
