@@ -1,12 +1,9 @@
 
 import re
-# import os
-# from pprint import pprint
-# import operator
 import collections
 import fractions as frac
 import numpy as np
-from parser_functions import *
+from parser_functions import sorted_func
 from formatting_functions import find_all_parens
 
 
@@ -26,9 +23,7 @@ token_specification = [
 tok_reg = '|'.join('(?P<%s>%s)' % pair for pair in token_specification)
 token_re = re.compile(tok_reg)
 
-
-
-
+# Parser Prep
 
 
 def id_paren(expr):
@@ -77,6 +72,8 @@ def token_prep(expr):
     return expr_out
 
 
+# Parsing
+
 def tokenize(code):
     """Returns a list of named tuples containing the type of chunk, its
     content, as well as the start and end point in the function and it's
@@ -100,20 +97,31 @@ def tokenize(code):
             yield Token(kind, value, start, end)
 
 
-# ### Chunk Functions
+def chunk_expr(expr):
+    """Parses the expression and returns a list of numbers, binary operators,
+    functions with arguments, and parenthesis with contents.
+    """
+    mod_expr = token_prep(expr)
+
+    tokens = [token for token in tokenize(mod_expr)]
+
+    chunks = [[token[0], DCHUNK[token[0]](expr, token)] for token in tokens]
+
+    return chunks
+
+
+# Chunk processing
 
 
 def op_chunk(*tupe):
-    """Returns the binary operator in the chunk"""
+    """Returns the binary operator in the chunk as a string."""
     return tupe[1][1]
 
 
 def num_chunk(*tupe):
-    """converts number from string to numerical value"""
+    """Returnse the value of the string as a Fraction object."""
     num = tupe[1][1]
-    if num.count('.') == 1:
-        return float(num)
-    return int(num)
+    return frac.Fraction(num)
 
 
 def func_chunk(expr, tupe):
@@ -128,25 +136,23 @@ def func_chunk(expr, tupe):
 
 
 def paren_chunk(expr, tupe):
-    """Recursively chunks the contents of the parentheses in the expression"""
-    return chunk_expr(expr[tupe[2] + 1:tupe[3] - 1])
+    """Recursively chunks the contents of nested parentheses and returns a
+    list.
+    """
+    expr_in = expr[tupe[2] + 1:tupe[3] - 1]
 
+    if expr_in == 'j':
+        return [1j]
 
-def other_chunk(*tupe):
-    """Returns any unknown word, serves to identify unknown functions"""
-    return tupe[1][1]
-
-
-# def lrp_chunk(*tupe):
-#     return tupe[1][1]
+    return chunk_expr(expr_in)
 
 
 def pi_chunk(*tupe):
-    """Returns pi if present"""
+    """Returns pi as a numpi object."""
     return np.pi
 
-# dictionary mapping chunk type to appropriate function
 
+# dictionary mapping chunk type to appropriate function
 
 DCHUNK = {
     'NEGNUM': num_chunk,
@@ -154,120 +160,5 @@ DCHUNK = {
     'FUNC': func_chunk,
     'OP': op_chunk,
     'PARENS': paren_chunk,
-    'OTHER': other_chunk,
-    # 'LRP': lrp_chunk,
     'PI': pi_chunk,
 }
-
-# ### Parsing
-
-
-def chunk_expr(expr):
-    """Parses the expression and returns a list of numbers, binary operators,
-    """
-    mod_expr = token_prep(expr)
-
-    tokens = [token for token in tokenize(mod_expr)]
-
-    chunks = [[token[0], DCHUNK[token[0]](expr, token)] for token in tokens]
-
-    return chunks
-
-
-##############################################
-# Here
-##############################################
-
-def atomizer(chunks):
-    terms = []
-    # print(chunks)
-    for item in chunks:
-        # print(item)
-        if item[0] == 'PARENS':
-            terms += [atomizer(item[1])]
-        elif item[0] == 'FUNC':
-            f_term = atomizer(item[1][1])
-            # print(['item', type(item), item])
-            # print(func_mapper[item[1][0]])
-            terms += [func_mapper[item[1][0].upper()](f_term)]
-        else:
-            terms += [item[1]]
-
-    while not eval_ready(terms):
-        terms = atomizer(terms)
-
-    answer = evaluate_terms(terms)
-
-    return answer
-
-
-def evaluate(expr):
-    ud_expr = initial_prep(expr)
-    chunk = chunk_expr(ud_expr)
-
-    answer = atomizer(chunk)
-
-    if isinstance(answer, frac.Fraction):
-        answer = float(answer)
-
-    # print(answer, type(answer))
-
-    return answer
-
-
-def disp_ans(expr):
-    print(expr, '=', evaluate(expr))
-
-
-comma_reg = re.compile(r'(\d{1,3}(?:\,\d\d\d)+)')
-
-
-def comma_fix(matchobj):
-    old = matchobj.group()
-    num_comma = old.count(',')
-    new = '0' * num_comma + old.replace(',', '')
-    return new
-
-
-num = '-1,234,567'
-
-temp = comma_reg.sub(comma_fix, num)
-
-print(int(temp) == -1234567)
-
-
-
-# def tracefunc(frame, event, arg, indent=[0]):
-#     if event == "call":
-#         indent[0] += 2
-#         print("-" * indent[0] + "> call function", frame.f_code.co_name)
-#     elif event == "return":
-#         print("<" + "-" * indent[0], "exit function", frame.f_code.co_name)
-#         indent[0] -= 2
-#     return tracefunc
-
-
-# import sys
-# sys.settrace(tracefunc)
-
-# if __name__ == '__main__':
-#     EXP1 = '5+sin(4*6(3-5))'
-#     disp_ans(EXP1)
-
-#     EXP2 = '5+sin(-4)'
-#     disp_ans(EXP2)
-
-#     EXP3 = '4*6(3-5)'
-#     disp_ans(EXP3)
-
-#     EXP4 = '8 - 2(2)(3)'
-#     disp_ans(EXP4)
-
-#     EXP5 = '8 - 2*2*3'
-#     disp_ans(EXP5)
-
-    # neg_base = '-3^0.5'
-    # disp_ans(neg_base)
-
-    # neg_base2 = '8-3^2'
-    # disp_ans(neg_base2)
