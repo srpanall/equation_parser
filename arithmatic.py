@@ -16,7 +16,6 @@ BIN_OP_DICT = {
 # Regular expressions used in module
 
 MUL_DIV_RE = re.compile(r'([\*\/])')
-ADD_SUB_RE = re.compile(r'([\-\+])')
 
 
 def eval_a_op_b(terms, op_type):
@@ -28,19 +27,10 @@ def eval_a_op_b(terms, op_type):
 
     if op_type == 'md':
         bin_op = MUL_DIV_RE.search(test_string).group(0)
-    else:
-        bin_op = ADD_SUB_RE.search(test_string).group(0)
-
-    if bin_op == '-':
-        try:
-            index_1 = terms.index(bin_op)
-        except ValueError:
-            # print(terms)
-            index_1 = terms.index('+')
-            bin_op = '+'
-
-    else:
         index_1 = terms.index(bin_op)
+    else:
+        bin_op = terms[1]
+        index_1 = 1
 
     num_1, num_2 = terms[index_1 - 1], terms[index_1 + 1]
     terms[index_1 - 1] = BIN_OP_DICT[bin_op](num_1, num_2)
@@ -78,9 +68,7 @@ def evaluate_terms(terms):
     while MUL_DIV_RE.search(str(expr_terms)) is not None:
         expr_terms = eval_a_op_b(expr_terms, 'md')
 
-    while ADD_SUB_RE.search(str(expr_terms)) is not None:
-        if len(expr_terms) == 1:
-            break
+    while len(expr_terms) != 1:
         expr_terms = eval_a_op_b(expr_terms, 'pm')
 
     return expr_terms[0]
