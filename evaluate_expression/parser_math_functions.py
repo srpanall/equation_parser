@@ -100,7 +100,6 @@ defined. All entries in the list should be in ALL CAPS and functions
 should be named with the preffix 'func_'.
 
 E.g. sine is SIN in the list and the function func_sin needs to be defined.
-
 """
 
 func_text = ["ABS", "CEIL", "FLOOR", "MIN", "MAX", "MOD", "RTX", "ROUND",

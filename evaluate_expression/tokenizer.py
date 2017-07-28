@@ -15,7 +15,7 @@ from formatting_functions import find_all_parens
 
 Token = collections.namedtuple('Token', ['typ', 'value', 'start', 'stop'])
 
-token_specification = [
+TOKEN_SPECIFICATION = [
     ('NEGNUM', r'^(\-\d+\.?\d*)'),  # Negative integer or decimal number
     ('NUMBER', r'\d+\.?\d*'),       # Integer or decimal number
     ('PI', r'PI'),                  # PI
@@ -26,8 +26,8 @@ token_specification = [
     ('MISMATCH', r'.'),             # Any other character
 ]
 
-tok_reg = '|'.join('(?P<%s>%s)' % pair for pair in token_specification)
-token_re = re.compile(tok_reg)
+TOK_REG = '|'.join('(?P<%s>%s)' % pair for pair in TOKEN_SPECIFICATION)
+TOKEN_RE = re.compile(TOK_REG)
 
 # Formatting functions
 
@@ -86,7 +86,7 @@ def tokenize(code):
     position in the string"""
     dict_kinds = {'FUNC': '`', 'PARENS': '(_)'}
 
-    for mobj in token_re.finditer(code):
+    for mobj in TOKEN_RE.finditer(code):
         kind = mobj.lastgroup
 
         if kind in dict_kinds:
