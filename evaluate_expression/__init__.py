@@ -25,3 +25,6 @@ Examples:
 """
 
 from expression_parser import evaluate
+
+if __name__ == '__main__':
+    print(evaluate('3+4'))
